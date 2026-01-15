@@ -1,76 +1,40 @@
+"""
+Backward-compatible wrapper for prompt retrieval.
+Now uses local prompts instead of LangSmith Hub.
+
+This module maintains the same API as before but uses the local prompts module.
+"""
+
 from __future__ import annotations
 
-import asyncio
-import os
-from typing import Optional
-
-from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from langsmith import Client
-
-load_dotenv()
-
-GLOBAL_MODEL_ENV_KEY = "GLOBAL_MODEL"
-_DEFAULT_MODEL_NAME = "NONE"
-
-_cached_model_name: Optional[str] = None
-_cached_model: Optional[ChatOpenAI] = None
-_cached_client: Optional[Client] = None
-
-
-def _get_target_model_name() -> Optional[str]:
-    target_model = os.getenv(GLOBAL_MODEL_ENV_KEY, _DEFAULT_MODEL_NAME)
-    if not target_model or target_model.upper() == _DEFAULT_MODEL_NAME:
-        return None
-    return target_model
-
-
-def _get_or_create_global_model() -> Optional[ChatOpenAI]:
-    global _cached_model_name, _cached_model
-
-    target_model = _get_target_model_name()
-    if target_model is None:
-        _cached_model = None
-        _cached_model_name = None
-        return None
-
-    if _cached_model is None or target_model != _cached_model_name:
-        _cached_model = ChatOpenAI(model=target_model, temperature=0)
-        _cached_model_name = target_model
-
-    return _cached_model
-
-
-def patched_pull_prompt(client: Client, name: str, include_model: bool = False):
-    override_model = _get_or_create_global_model()
-    should_bind_override = include_model and override_model is not None
-
-    prompt = Client.pull_prompt(
-        client,
-        name,
-        include_model=include_model and not should_bind_override,
-    )
-
-    if should_bind_override:
-        return prompt | override_model
-
-    return prompt
+# Import from the new local prompts module
+from src.utils.prompts import get_prompt, get_prompt_async
 
 
 def pull_prompt(name: str, include_model: bool = False):
-    global _cached_client
+    """
+    Get a prompt by name from the local registry.
 
-    if _cached_client is None:
-        _cached_client = Client()
+    Args:
+        name: The prompt name
+        include_model: If True, bind the prompt to a ChatOpenAI model
 
-    return patched_pull_prompt(_cached_client, name, include_model=include_model)
+    Returns:
+        The prompt template, optionally bound to a model
+    """
+    return get_prompt(name, include_model=include_model)
 
 
 async def pull_prompt_async(name: str, include_model: bool = False):
-    """Async-friendly wrapper that fetches prompts without blocking the event loop."""
-    return await asyncio.to_thread(
-        pull_prompt,
-        name,
-        include_model,
-    )
+    """
+    Async version of pull_prompt for compatibility.
+
+    Args:
+        name: The prompt name
+        include_model: If True, bind the prompt to a ChatOpenAI model
+
+    Returns:
+        The prompt template, optionally bound to a model
+    """
+    return await get_prompt_async(name, include_model=include_model)
 
