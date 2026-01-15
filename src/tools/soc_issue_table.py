@@ -26,9 +26,9 @@ def make_generate_soc_issue_table():
       
       output = soc_issue_table_prompt.invoke(
           {
-              "claimant_statement": claimant_statement,
-              "defendant_statement": defendant_statement,
-              "table_of_documents": table_of_documents,
+              "claim_text": claimant_statement,
+              "defence_text": defendant_statement,
+              "document_details": table_of_documents,
           }
       )
       
