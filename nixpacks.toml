@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["python311"]
+
+[phases.install]
+cmds = ["pip install uv", "uv sync"]
+
+[start]
+cmd = "uv run langgraph up --port ${PORT:-8123}"
