@@ -45,6 +45,21 @@ app.add_middleware(
 
 
 # ---------------------------------------------------------------------------
+# Health Check Endpoint
+# ---------------------------------------------------------------------------
+@app.get("/")
+async def health_check():
+    """Health check endpoint for Railway and other monitoring systems."""
+    return {"status": "healthy", "service": "resolution-backend"}
+
+
+@app.get("/health")
+async def health():
+    """Alternative health check endpoint."""
+    return {"status": "healthy", "service": "resolution-backend"}
+
+
+# ---------------------------------------------------------------------------
 # File-based Agent State Tracking (persists across processes)
 # ---------------------------------------------------------------------------
 def _load_agent_state_sync() -> Dict[str, Any]:

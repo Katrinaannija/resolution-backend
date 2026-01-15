@@ -53,4 +53,5 @@ htmlcov/
 # Application specific
 dataset/agent/agent_state.json
 dataset/agent/events/events.jsonl
-dataset/orchestrator_state/
+dataset/orchestrator_state/*
+!dataset/orchestrator_state/.gitkeep
