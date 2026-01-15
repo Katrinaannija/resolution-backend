@@ -31,6 +31,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://initial-fondle.lovable.app",
         "https://alien-lex-synth.lovable.app",
         "https://3d6287db-3650-4586-b08f-10cf6e2313d9.lovableproject.com",
         "https://id-preview--3d6287db-3650-4586-b08f-10cf6e2313d9.lovable.app",
