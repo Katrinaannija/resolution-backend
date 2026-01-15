@@ -1,0 +1,14 @@
+# Railway deployment configuration for Resolution Backend
+# Ensure these environment variables are set in Railway dashboard:
+# - OPENAI_API_KEY (required)
+# - GLOBAL_MODEL (optional, defaults to gpt-4o-mini)
+# - PORT (automatically provided by Railway)
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "uv run langgraph dev --host 0.0.0.0 --port ${PORT}"
+healthcheckPath = "/ok"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
