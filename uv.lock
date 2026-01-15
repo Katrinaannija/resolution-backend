@@ -1377,7 +1377,6 @@ dependencies = [
     { name = "langfuse" },
     { name = "langgraph" },
     { name = "langgraph-cli", extra = ["inmem"] },
-    { name = "langsmith" },
     { name = "python-dotenv" },
     { name = "requests" },
 ]
@@ -1391,7 +1390,6 @@ requires-dist = [
     { name = "langfuse", specifier = ">=2.0.0" },
     { name = "langgraph", specifier = ">=0.2.0" },
     { name = "langgraph-cli", extras = ["inmem"], specifier = ">=0.4.7" },
-    { name = "langsmith", specifier = ">=0.4.47" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "requests", specifier = ">=2.31.0" },
 ]

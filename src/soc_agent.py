@@ -20,33 +20,15 @@ from src.utils.pull_prompt import pull_prompt_async
 
 generate_soc_issue_table = make_generate_soc_issue_table()
 
-# Prompt name in LangSmith hub
-SOC_AGENT_USER_PROMPT_NAME = "soc_agent_user_prompt"
-
-# Fallback if the prompt is not yet in LangSmith
-DEFAULT_SOC_AGENT_USER_MESSAGE = (
-    "Generate the structured statement of claim issues JSON by analysing the "
-    "statement of claim, statement of defence, and the document table. Use "
-    "generate_soc_issue_table to build the JSON and persist it with "
-    "write_court_issues_json so downstream agents can consume it. Report once "
-    "the issues file has been saved. Don't generate invalid characters, line breaks, or other non-JSON characters."
-)
-
-
 async def _get_soc_user_prompt() -> str:
     """
-    Fetch the SOC agent user prompt from LangSmith.
-    Falls back to the hardcoded default if the prompt doesn't exist.
+    Fetch the SOC agent user prompt from local registry.
     """
-    try:
-        prompt_template = await pull_prompt_async(SOC_AGENT_USER_PROMPT_NAME)
-        # prompt_template is a ChatPromptTemplate; render with no vars to get text
-        rendered = prompt_template.invoke({})
-        # rendered is a ChatPromptValue; grab the first message content
-        return rendered.messages[0].content
-    except Exception:
-        # Prompt not found or other error – use fallback
-        return DEFAULT_SOC_AGENT_USER_MESSAGE
+    prompt_template = await pull_prompt_async("soc_agent_user_prompt")
+    # prompt_template is a ChatPromptTemplate; render with no vars to get text
+    rendered = prompt_template.invoke({})
+    # rendered is a ChatPromptValue; grab the first message content
+    return rendered.messages[0].content
 
 MODEL_NAME = "gpt-5.1"
 
