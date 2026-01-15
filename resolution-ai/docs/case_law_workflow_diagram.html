@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Law Workflow — Resolution AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --accent-gold: #d4af37;
+            --accent-gold-dim: #a68c2a;
+            --accent-teal: #3fb9a7;
+            --accent-blue: #58a6ff;
+            --accent-purple: #a371f7;
+            --accent-orange: #f0883e;
+            --accent-red: #f85149;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border: #30363d;
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Pro', Georgia, serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-teal), var(--accent-purple));
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.init { background: var(--accent-blue); }
+        .legend-dot.pipeline-a { background: var(--accent-teal); }
+        .legend-dot.pipeline-b { background: var(--accent-purple); }
+        .legend-dot.join { background: var(--accent-gold); }
+        .legend-dot.output { background: var(--accent-orange); }
+
+        /* Workflow Graph */
+        .workflow-graph {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .workflow-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .workflow-row.parallel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Pipeline Labels */
+        .pipeline-label {
+            position: absolute;
+            top: -2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .pipeline-a-label {
+            left: 20%;
+            color: var(--accent-teal);
+        }
+
+        .pipeline-b-label {
+            right: 20%;
+            color: var(--accent-purple);
+        }
+
+        /* Node Styling */
+        .node {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            min-width: 280px;
+            max-width: 420px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .node:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px var(--shadow);
+        }
+
+        .node.init { border-color: var(--accent-blue); }
+        .node.pipeline-a { border-color: var(--accent-teal); }
+        .node.pipeline-b { border-color: var(--accent-purple); }
+        .node.join { border-color: var(--accent-gold); }
+        .node.output { border-color: var(--accent-orange); }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .node-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .node.init .node-icon { background: rgba(88, 166, 255, 0.2); }
+        .node.pipeline-a .node-icon { background: rgba(63, 185, 167, 0.2); }
+        .node.pipeline-b .node-icon { background: rgba(163, 113, 247, 0.2); }
+        .node.join .node-icon { background: rgba(212, 175, 55, 0.2); }
+        .node.output .node-icon { background: rgba(240, 136, 62, 0.2); }
+
+        .node-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .node-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Prompt Badge */
+        .prompt-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(163, 113, 247, 0.15);
+            border: 1px solid rgba(163, 113, 247, 0.3);
+            color: var(--accent-purple);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-badge::before {
+            content: '⚡';
+        }
+
+        /* Tool Badge */
+        .tool-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(63, 185, 167, 0.15);
+            border: 1px solid rgba(63, 185, 167, 0.3);
+            color: var(--accent-teal);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        .tool-badge::before {
+            content: '🔧';
+        }
+
+        /* IO Sections */
+        .io-section {
+            margin-top: 1rem;
+        }
+
+        .io-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .io-label.input { color: var(--accent-blue); }
+        .io-label.output { color: var(--accent-orange); }
+
+        .io-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .io-item {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        /* Connectors */
+        .connector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .connector-line {
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--border), var(--accent-gold-dim));
+            border-radius: 2px;
+        }
+
+        .connector-fork {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 2rem;
+            padding: 1rem 0;
+        }
+
+        .fork-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .fork-line-h {
+            width: 200px;
+            height: 3px;
+            background: var(--border);
+        }
+
+        .fork-line-v {
+            width: 3px;
+            height: 30px;
+            background: var(--border);
+        }
+
+        /* Join Arrow */
+        .join-indicator {
+            text-align: center;
+            padding: 1.5rem 0;
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+        }
+
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin: 3rem 0 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+        }
+
+        /* Detailed Node Cards */
+        .detail-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .detail-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .detail-card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .detail-card-header h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .detail-card-body {
+            padding: 1.5rem;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-section h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .detail-section p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .detail-section code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+        }
+
+        .prompt-detail {
+            background: linear-gradient(135deg, rgba(163, 113, 247, 0.1) 0%, rgba(163, 113, 247, 0.05) 100%);
+            border: 1px solid rgba(163, 113, 247, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .prompt-detail .prompt-name {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-purple);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .prompt-detail .prompt-vars {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .prompt-detail .prompt-vars span {
+            display: inline-block;
+            background: var(--bg-tertiary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            margin: 0.2rem;
+        }
+
+        /* Visual Flow Diagram */
+        .visual-flow {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem 0;
+            overflow-x: auto;
+        }
+
+        .flow-svg {
+            width: 100%;
+            min-width: 1000px;
+            height: auto;
+        }
+
+        /* State Schema */
+        .state-schema {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .state-schema h3 {
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .schema-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .schema-item {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .schema-item .key {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-teal);
+            font-size: 0.9rem;
+        }
+
+        .schema-item .type {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .schema-item .desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Prompt Engineering Guide */
+        .prompt-guide {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--accent-gold-dim);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+
+        .prompt-guide h3 {
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prompt-guide h3::before {
+            content: '✏️';
+        }
+
+        .prompt-guide p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-list {
+            list-style: none;
+        }
+
+        .prompt-list li {
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .prompt-list .name {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-purple);
+            font-size: 0.85rem;
+        }
+
+        .prompt-list .purpose {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8rem; }
+            .workflow-row.parallel { grid-template-columns: 1fr; }
+            .node { min-width: 100%; }
+            .detail-cards { grid-template-columns: 1fr; }
+            .prompt-list li { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚖️ Case Law Workflow</h1>
+        <p>Automated legal research pipeline that analyzes court issues, searches case law, and generates evidence-backed recommendations</p>
+    </header>
+
+    <div class="container">
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-dot init"></div>
+                <span>Initialization</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot pipeline-a"></div>
+                <span>Pipeline A: Keyword Search</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot pipeline-b"></div>
+                <span>Pipeline B: Judgement Focus</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot join"></div>
+                <span>Join & Process</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot output"></div>
+                <span>Final Output</span>
+            </div>
+        </div>
+
+        <!-- Visual Flow Diagram -->
+        <div class="visual-flow">
+            <svg class="flow-svg" viewBox="0 0 1000 680" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background pattern -->
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#21262d" stroke-width="0.5"/>
+                    </pattern>
+                    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#d4af37;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#f0d77a;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#3fb9a7;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#5ed4c2;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#a371f7;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#c9a7ff;stop-opacity:1" />
+                    </linearGradient>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#6e7681"/>
+                    </marker>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)"/>
+
+                <!-- Pipeline Labels -->
+                <text x="280" y="160" fill="#3fb9a7" font-family="Crimson Pro" font-size="12" font-weight="600" text-anchor="middle">PIPELINE A</text>
+                <text x="280" y="175" fill="#8b949e" font-family="Crimson Pro" font-size="10" text-anchor="middle">Keyword Search</text>
+                <text x="720" y="160" fill="#a371f7" font-family="Crimson Pro" font-size="12" font-weight="600" text-anchor="middle">PIPELINE B</text>
+                <text x="720" y="175" fill="#8b949e" font-family="Crimson Pro" font-size="10" text-anchor="middle">Focus Analysis</text>
+
+                <!-- Connection Lines -->
+                <!-- Entry to Initialize -->
+                <path d="M 500 25 L 500 45" stroke="#6e7681" stroke-width="2" marker-end="url(#arrowhead)"/>
+                
+                <!-- Initialize to Load Court Issue -->
+                <path d="M 500 95 L 500 125" stroke="#6e7681" stroke-width="2" marker-end="url(#arrowhead)"/>
+                
+                <!-- Fork from Load Court Issue -->
+                <path d="M 420 155 L 280 155 L 280 185" stroke="#3fb9a7" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <path d="M 580 155 L 720 155 L 720 185" stroke="#a371f7" stroke-width="2" marker-end="url(#arrowhead)"/>
+                
+                <!-- Pipeline A connections -->
+                <path d="M 280 235 L 280 265" stroke="#3fb9a7" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <path d="M 280 315 L 280 345" stroke="#3fb9a7" stroke-width="2" marker-end="url(#arrowhead)"/>
+                <path d="M 280 395 L 280 430" stroke="#3fb9a7" stroke-width="2" marker-end="url(#arrowhead)"/>
+                
+                <!-- Pipeline B continues down -->
+                <path d="M 720 235 L 720 430" stroke="#a371f7" stroke-width="2" stroke-dasharray="5,5"/>
+                
+                <!-- Join at Create Issue Guidelines -->
+                <path d="M 280 430 L 280 470 L 420 470" stroke="#3fb9a7" stroke-width="2"/>
+                <path d="M 720 430 L 720 470 L 580 470" stroke="#a371f7" stroke-width="2"/>
+                <circle cx="500" cy="470" r="8" fill="#d4af37"/>
+                
+                <!-- Continue to Micro Verdicts -->
+                <path d="M 500 480 L 500 505" stroke="#d4af37" stroke-width="2" marker-end="url(#arrowhead)"/>
+                
+                <!-- Micro Verdicts to Aggregate -->
+                <path d="M 500 555 L 500 580" stroke="#d4af37" stroke-width="2" marker-end="url(#arrowhead)"/>
+                
+                <!-- Aggregate to Save -->
+                <path d="M 500 630 L 500 655" stroke="#f0883e" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                <!-- Nodes -->
+                <!-- START -->
+                <circle cx="500" cy="15" r="10" fill="#58a6ff"/>
+                <text x="500" y="18" fill="#0d1117" font-family="Crimson Pro" font-size="10" font-weight="bold" text-anchor="middle">S</text>
+                
+                <!-- Initialize State -->
+                <rect x="400" y="50" width="200" height="40" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+                <text x="500" y="75" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Initialize State</text>
+                
+                <!-- Load Court Issue -->
+                <rect x="400" y="130" width="200" height="40" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+                <text x="500" y="155" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Load Court Issue</text>
+                
+                <!-- Generate Keywords -->
+                <rect x="180" y="190" width="200" height="40" rx="8" fill="#161b22" stroke="#3fb9a7" stroke-width="2"/>
+                <text x="280" y="210" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Generate Keywords</text>
+                <text x="280" y="225" fill="#a371f7" font-family="JetBrains Mono" font-size="8" text-anchor="middle">⚡ case_law_keywords</text>
+                
+                <!-- Search Case Law -->
+                <rect x="180" y="270" width="200" height="40" rx="8" fill="#161b22" stroke="#3fb9a7" stroke-width="2"/>
+                <text x="280" y="290" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Search Case Law</text>
+                <text x="280" y="305" fill="#3fb9a7" font-family="JetBrains Mono" font-size="8" text-anchor="middle">🔧 UK National Archives API</text>
+                
+                <!-- Fetch Case Document -->
+                <rect x="180" y="350" width="200" height="40" rx="8" fill="#161b22" stroke="#3fb9a7" stroke-width="2"/>
+                <text x="280" y="370" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Fetch Case Document</text>
+                <text x="280" y="385" fill="#3fb9a7" font-family="JetBrains Mono" font-size="8" text-anchor="middle">🔧 Snippet Extractor</text>
+                
+                <!-- Judgement Focus -->
+                <rect x="620" y="190" width="200" height="40" rx="8" fill="#161b22" stroke="#a371f7" stroke-width="2"/>
+                <text x="720" y="210" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Judgement Focus</text>
+                <text x="720" y="225" fill="#a371f7" font-family="JetBrains Mono" font-size="8" text-anchor="middle">⚡ case_law_judgement_focus</text>
+                
+                <!-- Create Issue Guidelines -->
+                <rect x="400" y="445" width="200" height="40" rx="8" fill="#161b22" stroke="#d4af37" stroke-width="2"/>
+                <text x="500" y="462" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Create Issue Guidelines</text>
+                <text x="500" y="478" fill="#a371f7" font-family="JetBrains Mono" font-size="8" text-anchor="middle">⚡ case_law_issue_guidelines</text>
+                
+                <!-- Micro Verdicts -->
+                <rect x="400" y="510" width="200" height="40" rx="8" fill="#161b22" stroke="#d4af37" stroke-width="2"/>
+                <text x="500" y="527" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Micro Verdicts</text>
+                <text x="500" y="543" fill="#a371f7" font-family="JetBrains Mono" font-size="8" text-anchor="middle">⚡ case_law_micro_verdict</text>
+                
+                <!-- Aggregate Recommendations -->
+                <rect x="380" y="585" width="240" height="40" rx="8" fill="#161b22" stroke="#d4af37" stroke-width="2"/>
+                <text x="500" y="602" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Aggregate Recommendations</text>
+                <text x="500" y="618" fill="#a371f7" font-family="JetBrains Mono" font-size="8" text-anchor="middle">⚡ case_law_agg_recommendations</text>
+                
+                <!-- Save Result -->
+                <rect x="425" y="660" width="150" height="35" rx="8" fill="#161b22" stroke="#f0883e" stroke-width="2"/>
+                <text x="500" y="682" fill="#f0f6fc" font-family="Crimson Pro" font-size="13" text-anchor="middle">Save Result</text>
+
+                <!-- Parallel indicator -->
+                <text x="500" y="310" fill="#6e7681" font-family="Crimson Pro" font-size="11" font-style="italic" text-anchor="middle">⟷ runs in parallel ⟷</text>
+            </svg>
+        </div>
+
+        <!-- State Schema -->
+        <div class="state-schema">
+            <h3>📋 State Schema (Data Flowing Through the Pipeline)</h3>
+            <div class="schema-grid">
+                <div class="schema-item">
+                    <div class="key">issue_index</div>
+                    <div class="type">int</div>
+                    <div class="desc">Which issue from court_issues.json to process (0-indexed)</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">issue</div>
+                    <div class="type">Issue</div>
+                    <div class="desc">The loaded court issue containing date_event, undisputed_facts, claimant_position, defendant_position, legal_issue, relevant_documents</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">keywords</div>
+                    <div class="type">List[str]</div>
+                    <div class="desc">Generated search keywords for case law database</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">seen_keywords</div>
+                    <div class="type">Set[str]</div>
+                    <div class="desc">Previously used keywords to avoid repetition</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">cases</div>
+                    <div class="type">List[dict]</div>
+                    <div class="desc">Search results with case name, citation, court, date, URL</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">fetched_case_documents</div>
+                    <div class="type">List[str]</div>
+                    <div class="desc">Extracted snippets from relevant case judgments</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">focus_area</div>
+                    <div class="type">str</div>
+                    <div class="desc">Structured analysis of what to look for in judgments</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">issue_guidelines</div>
+                    <div class="type">List[str]</div>
+                    <div class="desc">Combined guidelines from case law and focus analysis</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">micro_verdicts</div>
+                    <div class="type">List[dict]</div>
+                    <div class="desc">Individual verdicts from each guideline</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">recommendation</div>
+                    <div class="type">str</div>
+                    <div class="desc">Final aggregated recommendation</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">suggestion</div>
+                    <div class="type">str</div>
+                    <div class="desc">Next steps or additional research suggestions</div>
+                </div>
+                <div class="schema-item">
+                    <div class="key">solved</div>
+                    <div class="type">bool</div>
+                    <div class="desc">Whether the issue has been fully resolved</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prompt Engineering Guide -->
+        <div class="prompt-guide">
+            <h3>Prompt Engineering Guide</h3>
+            <p>The following prompts are loaded from LangSmith and can be edited there. Each prompt directly influences how the AI analyzes and generates content at that stage.</p>
+            
+            <ul class="prompt-list">
+                <li>
+                    <span class="name">case_law_keywords</span>
+                    <span class="purpose">
+                        <strong>Purpose:</strong> Generates search keywords from the legal issue.<br>
+                        <strong>Variables:</strong> date_event, undisputed_facts, claimant_position, defendant_position, legal_issue, relevant_documents, num_keywords, seen_keywords<br>
+                        <strong>Output:</strong> List of keyword phrases to search
+                    </span>
+                </li>
+                <li>
+                    <span class="name">case_law_judgement_focus</span>
+                    <span class="purpose">
+                        <strong>Purpose:</strong> Analyzes the issue to determine what to look for in case law.<br>
+                        <strong>Variables:</strong> date_event, undisputed_facts, claimant_position, defendant_position, legal_issue, recommendation, suggestions<br>
+                        <strong>Output:</strong> Structured guidance on relevant legal principles
+                    </span>
+                </li>
+                <li>
+                    <span class="name">case_law_issue_guidelines</span>
+                    <span class="purpose">
+                        <strong>Purpose:</strong> Extracts applicable guidelines from case judgment snippets.<br>
+                        <strong>Variables:</strong> focus_area, court_judgment<br>
+                        <strong>Output:</strong> Guidelines derived from case law
+                    </span>
+                </li>
+                <li>
+                    <span class="name">case_law_micro_verdict</span>
+                    <span class="purpose">
+                        <strong>Purpose:</strong> Applies each guideline to generate a mini-verdict.<br>
+                        <strong>Variables:</strong> issue_guidelines, date_event, undisputed_facts, claimant_position, defendant_position, legal_issue, relevant_documents, recommendation<br>
+                        <strong>Output:</strong> Individual verdict with reasoning
+                    </span>
+                </li>
+                <li>
+                    <span class="name">case_law_agg_recommendations</span>
+                    <span class="purpose">
+                        <strong>Purpose:</strong> Combines all micro verdicts into a final recommendation.<br>
+                        <strong>Variables:</strong> date_event, undisputed_facts, claimant_position, defendant_position, legal_issue, micro_verdicts<br>
+                        <strong>Output:</strong> recommendation, suggestion, solved, documents, case_law flags
+                    </span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Detailed Node Cards -->
+        <div class="section-header">
+            <h2>Detailed Node Reference</h2>
+            <p>Complete documentation for each processing step</p>
+        </div>
+
+        <div class="detail-cards">
+            <!-- Initialize State -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(88, 166, 255, 0.2);">🚀</div>
+                    <h3>Initialize State</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p>Sets default values for all state fields to ensure the workflow has valid data throughout execution.</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Inputs</h4>
+                        <p><code>issue_index</code> (optional, defaults to 0)</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Outputs</h4>
+                        <p>Initialized state with empty defaults for all fields including <code>keywords</code>, <code>cases</code>, <code>issue_guidelines</code>, <code>micro_verdicts</code>, etc.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load Court Issue -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(88, 166, 255, 0.2);">📂</div>
+                    <h3>Load Court Issue</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p>Loads a specific court issue from the JSON dataset based on the issue index.</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Data Source</h4>
+                        <p><code>dataset/court_issues/court_issues.json</code></p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Outputs → issue</h4>
+                        <p>
+                            <code>date_event</code> — When the event occurred<br>
+                            <code>undisputed_facts</code> — Facts both parties agree on<br>
+                            <code>claimant_position</code> — Claimant's legal argument<br>
+                            <code>defendant_position</code> — Defendant's legal argument<br>
+                            <code>legal_issue</code> — The core legal question<br>
+                            <code>relevant_documents</code> — List of supporting documents
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Keywords -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(63, 185, 167, 0.2);">🔑</div>
+                    <h3>Generate Keywords</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p>Uses AI to generate relevant search keywords from the legal issue for searching the case law database.</p>
+                    </div>
+                    <div class="prompt-detail">
+                        <div class="prompt-name">⚡ case_law_keywords</div>
+                        <div class="prompt-vars">
+                            <span>date_event</span>
+                            <span>undisputed_facts</span>
+                            <span>claimant_position</span>
+                            <span>defendant_position</span>
+                            <span>legal_issue</span>
+                            <span>relevant_documents</span>
+                            <span>num_keywords</span>
+                            <span>seen_keywords</span>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Outputs</h4>
+                        <p><code>keywords</code> — List of search phrases (typically 2 per call)<br>
+                        <code>seen_keywords</code> — Updated set including new keywords</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Case Law -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(63, 185, 167, 0.2);">🔍</div>
+                    <h3>Search Case Law</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p>Searches the UK National Archives case law database using the generated keywords.</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Tool Used</h4>
+                        <p>🔧 <code>search_case_law</code> — Queries caselaw.nationalarchives.gov.uk</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Inputs</h4>
+                        <p><code>keywords</code> — From generate_keywords</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Outputs → cases</h4>
+                        <p>List of case metadata:<br>
+                        <code>name</code>, <code>citation</code>, <code>court</code>, <code>date</code>, <code>url</code>, <code>keyword_set</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fetch Case Document -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(63, 185, 167, 0.2);">📄</div>
+                    <h3>Fetch Case Document</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p>Downloads full judgments and extracts relevant snippets around keyword matches (500 words before/after).</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Tools Used</h4>
+                        <p>🔧 <code>get_case_judgment</code> — Fetches full judgment text<br>
+                        🔧 <code>extract_keyword_snippets</code> — Extracts contextual snippets (max 20 per doc)</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Outputs</h4>
+                        <p><code>fetched_case_documents</code> — List of snippet collections from each case</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Judgement Focus -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(163, 113, 247, 0.2);">🎯</div>
+                    <h3>Judgement Focus</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p>Runs in parallel with Pipeline A. Analyzes the issue to determine what legal principles and precedents to focus on when reviewing case law.</p>
+                    </div>
+                    <div class="prompt-detail">
+                        <div class="prompt-name">⚡ case_law_judgement_focus</div>
+                        <div class="prompt-vars">
+                            <span>date_event</span>
+                            <span>undisputed_facts</span>
+                            <span>claimant_position</span>
+                            <span>defendant_position</span>
+                            <span>legal_issue</span>
+                            <span>recommendation</span>
+                            <span>suggestions</span>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Outputs</h4>
+                        <p><code>focus_area</code> — Structured guidance on what to extract from judgments</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Issue Guidelines -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(212, 175, 55, 0.2);">📐</div>
+                    <h3>Create Issue Guidelines</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p><strong>JOIN POINT:</strong> Combines outputs from both pipelines. Uses the focus area to extract relevant guidelines from each fetched case document.</p>
+                    </div>
+                    <div class="prompt-detail">
+                        <div class="prompt-name">⚡ case_law_issue_guidelines</div>
+                        <div class="prompt-vars">
+                            <span>focus_area</span>
+                            <span>court_judgment</span>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Outputs</h4>
+                        <p><code>issue_guidelines</code> — List of guidelines, one per case document</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Micro Verdicts -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(212, 175, 55, 0.2);">⚖️</div>
+                    <h3>Micro Verdicts</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p>Generates individual verdicts by applying each guideline to the original issue. Builds incrementally on previous verdicts.</p>
+                    </div>
+                    <div class="prompt-detail">
+                        <div class="prompt-name">⚡ case_law_micro_verdict</div>
+                        <div class="prompt-vars">
+                            <span>issue_guidelines</span>
+                            <span>date_event</span>
+                            <span>undisputed_facts</span>
+                            <span>claimant_position</span>
+                            <span>defendant_position</span>
+                            <span>legal_issue</span>
+                            <span>relevant_documents</span>
+                            <span>recommendation</span>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Outputs</h4>
+                        <p><code>micro_verdicts</code> — List of individual verdict objects</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aggregate Recommendations -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(212, 175, 55, 0.2);">🏛️</div>
+                    <h3>Aggregate Recommendations</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p>Synthesizes all micro verdicts into a final, cohesive recommendation with actionable next steps.</p>
+                    </div>
+                    <div class="prompt-detail">
+                        <div class="prompt-name">⚡ case_law_agg_recommendations</div>
+                        <div class="prompt-vars">
+                            <span>date_event</span>
+                            <span>undisputed_facts</span>
+                            <span>claimant_position</span>
+                            <span>defendant_position</span>
+                            <span>legal_issue</span>
+                            <span>micro_verdicts</span>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Outputs</h4>
+                        <p>
+                            <code>recommendation</code> — Final legal recommendation<br>
+                            <code>suggestion</code> — Next steps for further research<br>
+                            <code>solved</code> — Whether issue is fully resolved<br>
+                            <code>documents</code> — Whether more documents needed<br>
+                            <code>case_law</code> — Whether more case law needed
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Result -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="node-icon" style="background: rgba(240, 136, 62, 0.2);">💾</div>
+                    <h3>Save Result</h3>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-section">
+                        <h4>Purpose</h4>
+                        <p>Persists the final result to disk for later review and analysis.</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Output Location</h4>
+                        <p><code>dataset/issue_verdicts/issue_{index}.json</code></p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Saved Fields</h4>
+                        <p>issue_index, date_event, legal_issue, recommendation, suggestion, solved, documents, case_law, keywords, focus_area, micro_verdicts, full_issue</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Resolution AI — Case Law Workflow Documentation</p>
+        <p style="margin-top: 0.5rem; color: #6e7681;">Generated for prompt engineering reference</p>
+    </footer>
+
+    <script>
+        // Add smooth scroll and interactive highlights
+        document.querySelectorAll('.node').forEach(node => {
+            node.addEventListener('click', function() {
+                const nodeName = this.querySelector('.node-title')?.textContent || 
+                                this.textContent.trim();
+                // Find matching detail card and scroll to it
+                document.querySelectorAll('.detail-card h3').forEach(h3 => {
+                    if (h3.textContent.includes(nodeName.split(' ')[0])) {
+                        h3.closest('.detail-card').scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        h3.closest('.detail-card').style.boxShadow = '0 0 0 2px var(--accent-gold)';
+                        setTimeout(() => {
+                            h3.closest('.detail-card').style.boxShadow = '';
+                        }, 2000);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
