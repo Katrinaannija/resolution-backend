@@ -158,28 +158,83 @@ Generate a comprehensive judgement that addresses each issue. Return a JSON obje
 # ============================================================================
 
 CASE_LAW_KEYWORDS_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are a legal research specialist identifying case law search keywords.
+    ("system", """You are an expert UK legal research specialist optimizing searches for the UK National Archives case law database (caselaw.nationalarchives.gov.uk).
 
-Your task is to generate effective search keywords for finding relevant case law precedents."""),
+Your expertise includes:
+- UK legal taxonomy and terminology (common law, equity, statute)
+- Multi-tier keyword strategy (broad principles → specific doctrines → factual patterns)
+- UK court hierarchy and citation formats
+- Effective search query construction for legal databases
+
+Your goal is to generate keywords that will find the most relevant UK case law precedents."""),
     ("user", """Legal Issue: {legal_issue}
 
-Issue Details:
-{issue_description}
+Issue Context:
+- Date/Event: {date_event}
+- Undisputed Facts: {undisputed_facts}
+- Claimant Position: {claimant_position}
+- Defendant Position: {defendant_position}
+- Relevant Documents: {relevant_documents}
 
 Previously Seen Keywords: {seen_keywords}
 
-Generate 3-5 new search keywords that would help find relevant case law. Avoid repeating previously seen keywords.
+TASK: Generate {num_keywords} NEW search keywords for UK National Archives case law database.
+
+SEARCH STRATEGY GUIDANCE:
+
+1. **Multi-Tier Approach** - Include keywords at different abstraction levels:
+   - Tier 1 (Broad): General legal principles (e.g., "breach of contract", "duty of care", "unjust enrichment")
+   - Tier 2 (Specific): UK legal doctrines and rules (e.g., "contra proferentem", "remoteness of damage", "Hadley v Baxendale")
+   - Tier 3 (Factual): Specific fact patterns (e.g., "late payment", "defective goods", "professional negligence")
+
+2. **UK-Specific Terminology**:
+   - Use UK legal terms (e.g., "claimant" not "plaintiff", "solicitor" not "attorney")
+   - Reference UK statutes where relevant (e.g., "Sale of Goods Act 1979", "Consumer Rights Act 2015")
+   - Consider UK common law concepts and equitable remedies
+
+3. **Search Optimization**:
+   - Combine related terms with OR (e.g., "negligence OR duty of care")
+   - Use precise legal terminology that appears in judgments
+   - Avoid overly narrow searches (no case names unless directly relevant)
+   - Consider alternative legal frameworks and causes of action
+
+4. **Iteration Strategy** (based on previously seen keywords):
+   - If previous keywords were too broad: Use more specific doctrines or fact patterns
+   - If previous keywords were too narrow: Broaden to general principles
+   - Try alternative legal theories or related areas of law
+   - Consider counterarguments and defenses
+
+5. **Core Legal Concepts to Extract**:
+   - What is the PRIMARY legal relationship? (contract, tort, property, equity, etc.)
+   - What is the SPECIFIC cause of action? (breach, negligence, misrepresentation, etc.)
+   - What REMEDY is sought? (damages, injunction, specific performance, etc.)
+   - What DEFENSES might apply? (limitation, exclusion clauses, contributory negligence, etc.)
+
+AVOID:
+- Repeating keywords from "Previously Seen Keywords"
+- Overly generic terms (e.g., just "law" or "case")
+- Non-legal factual details (e.g., specific dates, amounts, names)
+- Keywords that are too niche (unlikely to appear in multiple cases)
 
 Return a JSON object:
-{{"keywords": ["keyword1", "keyword2", "keyword3"]}}""")
+{{"keywords": ["keyword1", "keyword2", "keyword3"]}}
+
+Each keyword should be optimized for UK National Archives search and provide a different angle on finding relevant precedents.""")
 ])
 
 CASE_LAW_JUDGEMENT_FOCUS_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are a legal analyst identifying key focus areas for case law analysis."""),
     ("user", """Legal Issue: {legal_issue}
 
-Issue Description:
-{issue_description}
+Issue Context:
+- Date/Event: {date_event}
+- Undisputed Facts: {undisputed_facts}
+- Claimant Position: {claimant_position}
+- Defendant Position: {defendant_position}
+
+Current Analysis State:
+- Current Recommendation: {recommendation}
+- Current Suggestions: {suggestions}
 
 Identify the primary legal focus areas that should guide the case law search and analysis. What specific legal principles, doctrines, or precedents are most relevant?
 
@@ -189,37 +244,41 @@ Return a JSON object:
 
 CASE_LAW_ISSUE_GUIDELINES_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are synthesizing case law research and legal focus areas into actionable guidelines."""),
-    ("user", """Legal Issue: {legal_issue}
+    ("user", """Focus Area: {focus_area}
 
-Focus Area: {focus_area}
+Retrieved Case Law Document:
+{court_judgment}
 
-Retrieved Case Law:
-{cases_summary}
+Create comprehensive guidelines for resolving this issue based on the case law document and focus area.
 
-Create comprehensive guidelines for resolving this issue based on the case law and focus area.
-
-Return a JSON object:
-{{"guidelines": ["guideline1", "guideline2", ...]}}""")
+Provide your guidelines as clear, structured text. This will be collected with other guidelines from different case law documents.""")
 ])
 
 CASE_LAW_MICRO_VERDICT_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are analyzing individual case law precedents to generate micro-verdicts."""),
+    ("system", """You are analyzing case law guidelines to generate micro-verdicts for legal issues."""),
     ("user", """Legal Issue: {legal_issue}
 
-Case Document:
-{case_document}
+Issue Context:
+- Date/Event: {date_event}
+- Undisputed Facts: {undisputed_facts}
+- Claimant Position: {claimant_position}
+- Defendant Position: {defendant_position}
+- Relevant Documents: {relevant_documents}
 
-Guidelines:
-{guidelines}
+Current Recommendation: {recommendation}
 
-Analyze this case and generate a micro-verdict: how does this case precedent apply to the current legal issue?
+Case Law Guidelines:
+{issue_guidelines}
+
+Based on these guidelines, generate a micro-verdict with a recommendation and suggestion for resolving this legal issue.
 
 Return a JSON object:
 {{
-  "case_name": "Name of the case",
-  "relevance": "How relevant is this case (high/medium/low)",
-  "key_principle": "The key legal principle from this case",
-  "application": "How this principle applies to the current issue"
+  "recommendation": "Specific recommendation based on this guideline",
+  "suggestion": "Suggested next steps",
+  "solved": true/false,
+  "documents": true/false,
+  "case_law": true/false
 }}""")
 ])
 
@@ -227,13 +286,16 @@ CASE_LAW_AGG_RECOMMENDATIONS_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are synthesizing multiple case law analyses into a final recommendation."""),
     ("user", """Legal Issue: {legal_issue}
 
+Issue Context:
+- Date/Event: {date_event}
+- Undisputed Facts: {undisputed_facts}
+- Claimant Position: {claimant_position}
+- Defendant Position: {defendant_position}
+
 Micro Verdicts:
 {micro_verdicts}
 
-Guidelines:
-{guidelines}
-
-Aggregate all the micro-verdicts and guidelines into a final recommendation and suggestion.
+Aggregate all the micro-verdicts into a final recommendation and suggestion.
 
 Return a JSON object:
 {{
@@ -254,57 +316,67 @@ DOCUMENTS_FOCUS_AREA_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are identifying which documents are relevant to a specific legal issue."""),
     ("user", """Legal Issue: {legal_issue}
 
-Issue Description:
-{issue_description}
+Issue Context:
+- Date/Event: {date_event}
+- Undisputed Facts: {undisputed_facts}
+- Claimant Position: {claimant_position}
+- Defendant Position: {defendant_position}
+- Relevant Documents: {relevant_documents}
+
+Current Analysis State:
+- Current Recommendation: {recommendation}
+- Current Suggestion: {suggestion}
 
 Available Documents:
-{available_documents}
+{all_document_details}
 
 Identify which documents are most relevant to this legal issue and what information should be extracted from them.
 
 Return a JSON object:
 {{
-  "relevant_documents": ["doc1", "doc2", ...],
-  "extraction_focus": "What specific information to look for in these documents"
+  "file_focus": "What specific information to look for in these documents",
+  "file_names": ["doc1", "doc2", ...]
 }}""")
 ])
 
 DOCUMENTS_EXTRACT_CONTENT_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are extracting relevant information from legal documents."""),
-    ("user", """Legal Issue: {legal_issue}
+    ("user", """Focus Area: {focus_area}
 
-Focus Area: {focus_area}
-
-Document Name: {document_name}
+Document Name: {filename}
 Document Content:
 {document_content}
 
-Extract information from this document that is relevant to the legal issue and focus area.
+Extract information from this document that is relevant to the focus area.
 
-Return a JSON object:
-{{
-  "document_name": "Name of the document",
-  "relevant_excerpts": ["excerpt1", "excerpt2", ...],
-  "key_findings": ["finding1", "finding2", ...],
-  "summary": "Brief summary of relevant information"
-}}""")
+Provide a clear, structured summary of the relevant information found in this document.""")
 ])
 
 DOCUMENTS_CREATE_MICRO_VERDICT_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are analyzing extracted document information to generate micro-verdicts."""),
     ("user", """Legal Issue: {legal_issue}
 
-Document Information:
-{document_info}
+Issue Context:
+- Date/Event: {date_event}
+- Undisputed Facts: {undisputed_facts}
+- Claimant Position: {claimant_position}
+- Defendant Position: {defendant_position}
+
+Current Recommendation: {recommendation}
+
+Document: {filename}
+Extracted Information:
+{document_content}
 
 Generate a micro-verdict: what does this document evidence reveal about the legal issue?
 
 Return a JSON object:
 {{
-  "document_name": "Name of the document",
-  "verdict": "Analysis of what this document shows",
-  "supports": "plaintiff|defendant|neutral",
-  "strength": "strong|moderate|weak"
+  "recommendation": "Recommendation extension based on this document",
+  "suggestion": "Suggested next steps based on this evidence",
+  "solved": true/false,
+  "documents": true/false,
+  "case_law": true/false
 }}""")
 ])
 
