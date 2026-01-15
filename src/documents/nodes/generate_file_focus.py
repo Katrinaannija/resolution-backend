@@ -1,6 +1,7 @@
 from src.documents.documents_state import DocumentsState
 from src.tools.document_store import get_all_document_details
 from src.utils.pull_prompt import pull_prompt
+from src.utils.prompt_output import coerce_prompt_output
 
 def generate_file_focus(state: DocumentsState) -> DocumentsState:
     """
@@ -32,9 +33,10 @@ def generate_file_focus(state: DocumentsState) -> DocumentsState:
         "recommendation": recommendation,
         "suggestion": suggestion
     })
+    parsed = coerce_prompt_output(result)
     
     return {
-        "file_focus": result["file_focus"],
-        "file_names": result["file_names"]
+        "file_focus": parsed.get("file_focus", ""),
+        "file_names": parsed.get("file_names", [])
     }
 

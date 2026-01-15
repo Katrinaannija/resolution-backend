@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from langchain.tools import tool
 
@@ -33,13 +34,16 @@ def get_all_document_details() -> str:
   return all_doc_details_path.read_text()
 
 @tool
-def write_court_issues_json(content: str) -> str:
+async def write_court_issues_json(content: str) -> str:
   """Saves court issues document to disk as json file"""
 
-  court_issues_dir.mkdir(parents=True, exist_ok=True)
-  if court_issues_file_path.write_text(content) == 1:
+  def _write() -> int:
+    court_issues_dir.mkdir(parents=True, exist_ok=True)
+    return court_issues_file_path.write_text(content)
+
+  if await asyncio.to_thread(_write) == 1:
     return "Failed to save the file"
-  
+
   return f"Court issues written succesfully to {court_issues_file_path}"
   
   

@@ -1,14 +1,15 @@
+import asyncio
 import json
 from pathlib import Path
 from datetime import datetime
 from src.case_law.case_law_state import CaseLawState
 
-def save_result(state: CaseLawState) -> dict:
+async def save_result(state: CaseLawState) -> dict:
     """Save the final case law workflow result to disk."""
     
     # Create output directory
     output_dir = Path(__file__).parent.parent.parent.parent / "dataset" / "issue_verdicts"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    await asyncio.to_thread(output_dir.mkdir, parents=True, exist_ok=True)
     
     # Get issue index and timestamp
     issue_idx = state.get("issue_index", 0)
@@ -31,9 +32,11 @@ def save_result(state: CaseLawState) -> dict:
         "full_issue": state["issue"]
     }
     
-    # Save to file
-    with open(filepath, 'w') as f:
-        json.dump(result_to_save, indent=2, fp=f)
+    def _write() -> None:
+        with open(filepath, "w") as f:
+            json.dump(result_to_save, indent=2, fp=f)
+
+    await asyncio.to_thread(_write)
     
     print(f"✓ Saved case law result to: {filepath}")
     

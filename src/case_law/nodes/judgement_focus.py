@@ -1,5 +1,6 @@
 from src.case_law.case_law_state import CaseLawState
 from src.utils.pull_prompt import pull_prompt_async
+from src.utils.prompt_output import coerce_prompt_output
 
 
 async def judgement_focus(state: CaseLawState) -> CaseLawState:
@@ -24,7 +25,8 @@ async def judgement_focus(state: CaseLawState) -> CaseLawState:
             "suggestions": state.get("suggestion", ""),
         }
     )
+    parsed = coerce_prompt_output(output)
 
     return {
-        "focus_area": output.content,
+        "focus_area": parsed.get("focus_area", ""),
     }

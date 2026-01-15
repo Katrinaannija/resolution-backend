@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from src.judgement.judgement_state import JudgementState
 from src.utils.pull_prompt import pull_prompt
+from src.utils.prompt_output import coerce_prompt_output
 
 
 def draft_judgement(state: JudgementState) -> JudgementState:
@@ -14,7 +15,8 @@ def draft_judgement(state: JudgementState) -> JudgementState:
             "defendant_statement": state.get("statement_of_defence", ""),
         }
     )
+    parsed = coerce_prompt_output(result)
 
     return {
-        "judgement": result["judgement"]
+        "judgement": parsed.get("judgement", "")
     }

@@ -18,6 +18,8 @@ from src.documents_workflow import graph as documents_graph
 from src.judgement.judgement_state import JudgementState
 from src.judgement_workflow import graph as judgement_graph
 from src.utils.pull_prompt import pull_prompt_async
+from src.utils.json_sanitize import load_json_file
+from src.utils.prompt_output import coerce_prompt_output
 
 from src.orchestrator.orchestrator_state import IssueWorkState
 from src.orchestrator.storage import (
@@ -155,14 +157,14 @@ class CourtIssueDeepAgent:
                 issue_state["solved"] = True
                 break
 
-            save_issue_state(issue_state)
+            await asyncio.to_thread(save_issue_state, issue_state)
 
             # If both workflows say no further work is needed, break early.
             if self._can_finalize(issue_state):
                 issue_state["solved"] = True
                 break
 
-        save_issue_state(issue_state)
+        await asyncio.to_thread(save_issue_state, issue_state)
         print(f"[orchestrator] Issue #{idx} {'solved' if issue_state['solved'] else 'pending'}")
         return issue_state
 
@@ -190,7 +192,9 @@ class CourtIssueDeepAgent:
             )
 
         if self.issues_path != DEFAULT_ISSUES_PATH:
-            self.issues_path.parent.mkdir(parents=True, exist_ok=True)
+            await asyncio.to_thread(
+                self.issues_path.parent.mkdir, parents=True, exist_ok=True
+            )
             await asyncio.to_thread(
                 shutil.copy2,
                 DEFAULT_ISSUES_PATH,
@@ -205,8 +209,7 @@ class CourtIssueDeepAgent:
                 f"Court issues file not found at {self.issues_path}. "
                 "The SOC agent prerequisite should generate this file automatically; verify the soc_agent run succeeded."
             )
-        with self.issues_path.open() as fp:
-            payload = json.load(fp)
+        payload = load_json_file(self.issues_path)
         return payload["events"]
 
     def _load_or_initialize_issue(
@@ -237,7 +240,8 @@ class CourtIssueDeepAgent:
                 "suggestion": s["suggestion"],
             }
         )
-        return result["next_action"]
+        parsed = coerce_prompt_output(result)
+        return parsed.get("next_action", "finalize")
 
     async def _run_case_law_async(self, state: IssueWorkState) -> IssueWorkState:
         rec = state["recommendation"] if "recommendation" in state else ""

@@ -1,13 +1,14 @@
+import asyncio
 import json
 from pathlib import Path
 from src.documents.documents_state import DocumentsState
 
-def save_documents_result(state: DocumentsState) -> dict:
+async def save_documents_result(state: DocumentsState) -> dict:
     """Save the final documents workflow result to disk."""
     
     # Create output directory
     output_dir = Path(__file__).parent.parent.parent.parent / "dataset" / "documents_verdicts"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    await asyncio.to_thread(output_dir.mkdir, parents=True, exist_ok=True)
     
     # Get issue index
     issue_idx = state.get("issue_index", 0)
@@ -28,9 +29,11 @@ def save_documents_result(state: DocumentsState) -> dict:
         "full_issue": state["issue"]
     }
     
-    # Save to file
-    with open(filepath, 'w') as f:
-        json.dump(result_to_save, indent=2, fp=f)
+    def _write() -> None:
+        with open(filepath, "w") as f:
+            json.dump(result_to_save, indent=2, fp=f)
+
+    await asyncio.to_thread(_write)
     
     print(f"✓ Saved documents result to: {filepath}")
     

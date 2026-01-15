@@ -15,9 +15,9 @@ def initialize_state(state: JudgementState) -> JudgementState:
         issue_data = issue["issue"]
         legal_issue = issue_data["legal_issue"]
         recommendation = issue["recommendation"].strip()
-        claimant_position = issue_data["claimant_position"]
-        defendant_position = issue_data["defendant_position"]
-        date_event = issue_data["date_event"]
+        claimant_position = issue_data.get("claimant_position", "")
+        defendant_position = issue_data.get("defendant_position", "")
+        date_event = issue_data.get("date_event", "")
 
         rows.append(
             f"Issue {idx}: {date_event}\n"

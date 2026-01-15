@@ -2,6 +2,7 @@ import json
 
 from src.case_law.case_law_state import CaseLawState
 from src.utils.pull_prompt import pull_prompt_async
+from src.utils.prompt_output import coerce_prompt_output
 
 
 async def aggregate_recommendations(state: CaseLawState) -> CaseLawState:
@@ -35,13 +36,14 @@ async def aggregate_recommendations(state: CaseLawState) -> CaseLawState:
         }
     )
 
-    print(result)
+    parsed = coerce_prompt_output(result)
+    print(parsed)
 
     return {
-        "recommendation": result.get("recommendation", ""),
-        "suggestion": result.get("suggestion", ""),
-        "solved": result.get("solved", False),
-        "documents": result.get("documents", False),
-        "case_law": result.get("case_law", False),
+        "recommendation": parsed.get("recommendation", ""),
+        "suggestion": parsed.get("suggestion", ""),
+        "solved": parsed.get("solved", False),
+        "documents": parsed.get("documents", False),
+        "case_law": parsed.get("case_law", False),
     }
 

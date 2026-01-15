@@ -49,8 +49,11 @@ htmlcov/
 
 # LangGraph
 .langgraph/
+.langgraph_api/
 
 # Application specific
 dataset/agent/agent_state.json
 dataset/agent/events/events.jsonl
 dataset/orchestrator_state/
+dataset/court_issues/
+dataset/issue_verdicts/

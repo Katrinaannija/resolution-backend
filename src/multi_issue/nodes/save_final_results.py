@@ -1,9 +1,10 @@
+import asyncio
 import json
 from pathlib import Path
 from datetime import datetime
 from src.multi_issue.multi_issue_state import MultiIssueState
 
-def save_final_results(state: MultiIssueState) -> dict:
+async def save_final_results(state: MultiIssueState) -> dict:
     issue_results = state.get("issue_results", [])
     
     if not issue_results:
@@ -11,7 +12,7 @@ def save_final_results(state: MultiIssueState) -> dict:
         return {}
     
     output_dir = Path(__file__).parent.parent.parent.parent / "dataset" / "issue_verdicts"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    await asyncio.to_thread(output_dir.mkdir, parents=True, exist_ok=True)
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"all_issues_final_{timestamp}.json"
@@ -51,8 +52,11 @@ def save_final_results(state: MultiIssueState) -> dict:
     }
     
     
-    with open(filepath, 'w') as f:
-        json.dump(final_output, indent=2, fp=f)
+    def _write() -> None:
+        with open(filepath, "w") as f:
+            json.dump(final_output, indent=2, fp=f)
+
+    await asyncio.to_thread(_write)
     
     return {}
 

@@ -4,6 +4,7 @@ from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnableP
 
 from src.case_law.case_law_state import CaseLawState
 from src.utils.pull_prompt import pull_prompt_async
+from src.utils.prompt_output import coerce_prompt_output
 
 async def micro_verdicts(state: CaseLawState) -> CaseLawState:
     micro_verdict_prompt = await pull_prompt_async(
@@ -14,13 +15,13 @@ async def micro_verdicts(state: CaseLawState) -> CaseLawState:
     issue_guidelines: List[str] = state["issue_guidelines"]
 
     base_context = {
-        "date_event": issue["date_event"],
-        "undisputed_facts": issue["undisputed_facts"],
-        "claimant_position": issue["claimant_position"],
-        "defendant_position": issue["defendant_position"],
-        "legal_issue": issue["legal_issue"],
-        "relevant_documents": "\n".join(issue["relevant_documents"]),
-        "recommendation": state["recommendation"],
+        "date_event": issue.get("date_event", ""),
+        "undisputed_facts": issue.get("undisputed_facts", ""),
+        "claimant_position": issue.get("claimant_position", ""),
+        "defendant_position": issue.get("defendant_position", ""),
+        "legal_issue": issue.get("legal_issue", ""),
+        "relevant_documents": "\n".join(issue.get("relevant_documents", []) or []),
+        "recommendation": state.get("recommendation", ""),
     }
 
     payload_builder = (
@@ -44,12 +45,13 @@ async def micro_verdicts(state: CaseLawState) -> CaseLawState:
     micro_verdicts = []
 
     for res in results:
+        parsed = coerce_prompt_output(res)
         micro_verdicts.append({
-            "recommendation": res["recommendation"],
-            "suggestion": res["suggestion"],
-            "solved": res["solved"],
-            "documents": res["documents"],
-            "case_law": res["case_law"],
+            "recommendation": parsed.get("recommendation", ""),
+            "suggestion": parsed.get("suggestion", ""),
+            "solved": parsed.get("solved", False),
+            "documents": parsed.get("documents", False),
+            "case_law": parsed.get("case_law", False),
         })
 
     return {"micro_verdicts": micro_verdicts}

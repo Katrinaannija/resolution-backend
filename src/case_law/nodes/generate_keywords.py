@@ -2,6 +2,7 @@ from typing import List
 
 from src.case_law.case_law_state import CaseLawState
 from src.utils.pull_prompt import pull_prompt_async
+from src.utils.prompt_output import coerce_prompt_output
 
 
 async def generate_keywords(state: CaseLawState) -> CaseLawState:
@@ -23,8 +24,9 @@ async def generate_keywords(state: CaseLawState) -> CaseLawState:
     }
 
     output = await keyword_prompt.ainvoke(payload)
+    parsed = coerce_prompt_output(output)
 
-    keywords: List[str] = output.get("keywords", [])
+    keywords: List[str] = parsed.get("keywords", [])
     seen_keywords = set(keywords) | set(state.get("seen_keywords", set()))
 
     return {

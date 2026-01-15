@@ -1,4 +1,5 @@
 from src.documents.documents_state import DocumentsState
+from src.utils.prompt_output import coerce_prompt_output
 from src.utils.pull_prompt import pull_prompt
 
 def aggregate_documents_recommendations(state: DocumentsState) -> DocumentsState:
@@ -36,12 +37,13 @@ def aggregate_documents_recommendations(state: DocumentsState) -> DocumentsState
         "current_suggestion": suggestion,
         "micro_verdicts": formatted_verdicts
     })
-    
-    final_recommendation = result.get("recommendation", "")
-    final_suggestion = result.get("suggestion", "")
-    solved = result.get("solved", False)
-    documents = result.get("documents", False)
-    case_law = result.get("case_law", False)
+
+    parsed = coerce_prompt_output(result)
+    final_recommendation = parsed.get("recommendation", "")
+    final_suggestion = parsed.get("suggestion", "")
+    solved = parsed.get("solved", False)
+    documents = parsed.get("documents", False)
+    case_law = parsed.get("case_law", False)
     
     print(f"\nFinal Recommendation:\n{final_recommendation}\n")
     print(f"\nFinal Suggestion:\n{final_suggestion}\n")

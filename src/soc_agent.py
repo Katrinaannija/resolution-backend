@@ -2,7 +2,6 @@ import asyncio
 from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
-from pydantic import BaseModel
 
 load_dotenv()
 
@@ -66,20 +65,8 @@ async def _ensure_soc_agent_loaded() -> Runnable:
         return _soc_agent
 
 
-class SocAgentMessage(BaseModel):
-    role: str
-    content: str
-
-
-class SocAgentMessageList(BaseModel):
-    messages: List[SocAgentMessage]
-
-
 def _build_soc_agent_messages(user_prompt: str) -> List[Dict[str, str]]:
-    payload = SocAgentMessageList(
-        messages=[SocAgentMessage(role="user", content=user_prompt)]
-    )
-    return payload.model_dump(mode="json")["messages"]
+    return [{"role": "user", "content": user_prompt}]
 
 
 async def agent(config: RunnableConfig | None = None) -> Runnable:

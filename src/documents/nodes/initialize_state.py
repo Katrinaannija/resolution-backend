@@ -1,4 +1,6 @@
 import json
+
+from src.utils.json_sanitize import load_json_file
 from pathlib import Path
 from typing import Optional, Tuple
 from src.documents.documents_state import DocumentsState, Issue
@@ -70,18 +72,17 @@ def initialize_state(state: DocumentsState) -> DocumentsState:
                 updates["suggestion"] = suggestion
         else:
             # Fall back to loading from court_issues.json
-            with open("dataset/court_issues/court_issues.json", "r") as f:
-                data = json.load(f)
+            data = load_json_file("dataset/court_issues/court_issues.json")
             
             event = data["events"][issue_index]
             
             updates["issue"] = Issue(
-                date_event=event["date_event"],
-                undisputed_facts=event["undisputed_facts"],
-                claimant_position=event["claimant_position"],
-                defendant_position=event["defendant_position"],
-                legal_issue=event["legal_issue"],
-                relevant_documents=event["relevant_documents"]
+                date_event=event.get("date_event", ""),
+                undisputed_facts=event.get("undisputed_facts", ""),
+                claimant_position=event.get("claimant_position", ""),
+                defendant_position=event.get("defendant_position", ""),
+                legal_issue=event.get("legal_issue", ""),
+                relevant_documents=event.get("relevant_documents", []) or []
             )
             
             # Initialize empty if not loading from verdict

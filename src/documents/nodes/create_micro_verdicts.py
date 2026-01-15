@@ -4,6 +4,7 @@ from typing import List
 
 from src.documents.documents_state import DocumentsState, MicroVerdict
 from src.utils.pull_prompt import pull_prompt_async
+from src.utils.prompt_output import coerce_prompt_output
 
 
 async def create_micro_verdicts(state: DocumentsState) -> DocumentsState:
@@ -49,14 +50,15 @@ async def create_micro_verdicts(state: DocumentsState) -> DocumentsState:
     
     for doc_info, result in zip(document_infos, results):
         filename = doc_info["filename"]
+        parsed = coerce_prompt_output(result)
         
         micro_verdict = MicroVerdict(
             filename=filename,
-            recommendation=result.get("recommendation", ""),
-            suggestion=result.get("suggestion", ""),
-            solved=result.get("solved", False),
-            documents=result.get("documents", False),
-            case_law=result.get("case_law", False),
+            recommendation=parsed.get("recommendation", ""),
+            suggestion=parsed.get("suggestion", ""),
+            solved=parsed.get("solved", False),
+            documents=parsed.get("documents", False),
+            case_law=parsed.get("case_law", False),
         )
         
         print(f"Created micro verdict for {filename}:\n{json.dumps(micro_verdict, indent=2)}\n")
