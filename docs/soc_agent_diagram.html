@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statement of Claim Agent — Resolution AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a2332;
+            --bg-tertiary: #243447;
+            --accent-gold: #d4a574;
+            --accent-gold-bright: #e8c49a;
+            --accent-teal: #4ecdc4;
+            --accent-coral: #ff6b6b;
+            --accent-purple: #a78bfa;
+            --accent-blue: #60a5fa;
+            --accent-green: #34d399;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --shadow: rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 3.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-teal), var(--accent-purple));
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+            text-shadow: 0 2px 20px rgba(212, 165, 116, 0.3);
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .subtitle {
+            margin-top: 0.5rem;
+            font-size: 1rem !important;
+            color: var(--text-muted) !important;
+            font-style: italic;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2.5rem;
+        }
+
+        /* Overview Section */
+        .overview-section {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(36, 52, 71, 0.5) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .overview-section::before {
+            content: '⚖️';
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            font-size: 2rem;
+            background: var(--bg-primary);
+            padding: 0 1rem;
+        }
+
+        .overview-section h2 {
+            color: var(--accent-gold);
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            padding-left: 0.5rem;
+            border-left: 3px solid var(--accent-gold);
+        }
+
+        .overview-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .overview-box {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .overview-box h3 {
+            color: var(--accent-teal);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .overview-box p, .overview-box li {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .overview-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .overview-box li::before {
+            content: '→';
+            color: var(--accent-gold);
+            margin-right: 0.5rem;
+        }
+
+        /* Agent Architecture */
+        .architecture-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+
+        .architecture-section h2 {
+            text-align: center;
+            color: var(--accent-gold);
+            font-size: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Visual Agent Diagram */
+        .agent-flow {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .flow-svg {
+            width: 100%;
+            min-width: 1000px;
+            height: auto;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            padding: 1.75rem;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1rem;
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+        }
+
+        .legend-dot.agent { background: var(--accent-gold); border-color: var(--accent-gold); }
+        .legend-dot.prompt { background: var(--accent-purple); border-color: var(--accent-purple); }
+        .legend-dot.tool { background: var(--accent-teal); border-color: var(--accent-teal); }
+        .legend-dot.data { background: var(--accent-blue); border-color: var(--accent-blue); }
+        .legend-dot.output { background: var(--accent-green); border-color: var(--accent-green); }
+
+        /* Component Cards */
+        .components-section {
+            margin: 4rem 0;
+        }
+
+        .components-section > h2 {
+            text-align: center;
+            color: var(--accent-gold);
+            font-size: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .component-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .component-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 50px var(--shadow);
+        }
+
+        .component-card.agent-core { border-left: 4px solid var(--accent-gold); }
+        .component-card.prompt-card { border-left: 4px solid var(--accent-purple); }
+        .component-card.tool-card { border-left: 4px solid var(--accent-teal); }
+
+        .component-header {
+            padding: 1.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(90deg, rgba(212, 165, 116, 0.05), transparent);
+        }
+
+        .component-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .agent-core .component-icon { background: var(--accent-gold); }
+        .prompt-card .component-icon { background: var(--accent-purple); }
+        .tool-card .component-icon { background: var(--accent-teal); }
+
+        .component-title-group h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .component-title-group .file-name {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .component-body {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .info-block {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .info-block h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-block h4.purpose { color: var(--accent-gold); }
+        .info-block h4.inputs { color: var(--accent-blue); }
+        .info-block h4.outputs { color: var(--accent-green); }
+
+        .info-block p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+        }
+
+        .info-block code {
+            font-family: 'Source Code Pro', monospace;
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--accent-teal);
+        }
+
+        .io-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .io-item {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .io-item.input { border: 1px solid var(--accent-blue); }
+        .io-item.output { border: 1px solid var(--accent-green); }
+
+        /* Tool Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .tool-item {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: border-color 0.3s ease;
+        }
+
+        .tool-item:hover {
+            border-color: var(--accent-teal);
+        }
+
+        .tool-item h4 {
+            font-family: 'Source Code Pro', monospace;
+            color: var(--accent-teal);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tool-item h4::before {
+            content: '🔧';
+        }
+
+        .tool-item p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-params {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .tool-params h5 {
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-params .param {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .tool-params .param .name {
+            color: var(--accent-teal);
+        }
+
+        .tool-params .param .type {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* Prompt Section */
+        .prompt-section {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(167, 139, 250, 0.05));
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .prompt-section h4 {
+            color: var(--accent-purple);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prompt-section h4::before {
+            content: '⚡';
+        }
+
+        .prompt-name {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 1.1rem;
+            color: var(--accent-purple);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .prompt-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border);
+        }
+
+        /* Agent Decision Flow */
+        .decision-flow {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+        }
+
+        .decision-flow h3 {
+            color: var(--accent-gold);
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .flow-steps {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            flex: 1;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .step-bubble {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            position: relative;
+        }
+
+        .step-bubble.input { background: linear-gradient(135deg, var(--accent-blue), #3b82f6); }
+        .step-bubble.think { background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-bright)); }
+        .step-bubble.act { background: linear-gradient(135deg, var(--accent-teal), #2dd4bf); }
+        .step-bubble.observe { background: linear-gradient(135deg, var(--accent-purple), #c084fc); }
+        .step-bubble.output { background: linear-gradient(135deg, var(--accent-green), #4ade80); }
+
+        .step-arrow {
+            flex: 0 0 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            padding-top: 2rem;
+        }
+
+        .flow-step h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .flow-step p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Prompt Engineering Guide */
+        .prompt-guide {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 2px solid var(--accent-purple);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .prompt-guide::before {
+            content: '✏️';
+            position: absolute;
+            top: -18px;
+            left: 30px;
+            font-size: 1.8rem;
+            background: var(--bg-primary);
+            padding: 0 0.75rem;
+        }
+
+        .prompt-guide h3 {
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .prompt-guide > p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .prompt-list {
+            list-style: none;
+        }
+
+        .prompt-list li {
+            padding: 1.5rem;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+            border: 1px solid var(--border);
+            transition: border-color 0.3s ease;
+        }
+
+        .prompt-list li:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .prompt-list .name {
+            font-family: 'Source Code Pro', monospace;
+            color: var(--accent-purple);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .prompt-list .purpose {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .prompt-list .purpose strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Data Flow */
+        .data-flow-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+        }
+
+        .data-flow-section h3 {
+            color: var(--accent-gold);
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .data-categories {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .data-category {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .data-category h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-category.input h4 { color: var(--accent-blue); }
+        .data-category.process h4 { color: var(--accent-teal); }
+        .data-category.output h4 { color: var(--accent-green); }
+
+        .data-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .data-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .data-item .key {
+            font-family: 'Source Code Pro', monospace;
+            color: var(--accent-teal);
+            font-size: 0.9rem;
+        }
+
+        .data-item .desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Use Cases */
+        .use-cases {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .use-cases::before {
+            content: '💡';
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            font-size: 2rem;
+            background: var(--bg-primary);
+            padding: 0 1rem;
+        }
+
+        .use-cases h3 {
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .use-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .use-case {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .use-case h4 {
+            color: var(--accent-teal);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .use-case p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .use-case .example {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            border-left: 3px solid var(--accent-gold);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 3rem;
+        }
+
+        footer strong {
+            color: var(--accent-gold);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .overview-content { grid-template-columns: 1fr; }
+            .component-body { grid-template-columns: 1fr; }
+            .data-categories { grid-template-columns: 1fr; }
+            .flow-steps { flex-direction: column; align-items: center; }
+            .step-arrow { transform: rotate(90deg); padding: 0; }
+        }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2rem; }
+            .prompt-list li { grid-template-columns: 1fr; }
+            .container { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📋 Statement of Claim Agent</h1>
+        <p>AI-powered legal document analysis agent that reads case files, extracts key information, and generates structured court issues for legal proceedings</p>
+        <p class="subtitle">Resolution AI — SOC Agent Documentation for Prompt Engineering</p>
+    </header>
+
+    <div class="container">
+        <!-- Overview Section -->
+        <section class="overview-section">
+            <h2>What This Agent Does</h2>
+            <div class="overview-content">
+                <div class="overview-box">
+                    <h3>🎯 Purpose</h3>
+                    <p>This is an <strong>autonomous AI agent</strong> that analyzes legal case documents to generate a structured Statement of Claim (SOC) issues table. Unlike a fixed workflow, this agent makes intelligent decisions about which tools to use and in what order based on the user's request.</p>
+                    <p style="margin-top: 1rem;">The agent is designed to:</p>
+                    <ul style="margin-top: 0.75rem;">
+                        <li>Read and understand case documents</li>
+                        <li>Identify the claimant and defendant statements</li>
+                        <li>Generate a structured issues table</li>
+                        <li>Save results for further processing</li>
+                    </ul>
+                </div>
+                <div class="overview-box">
+                    <h3>🤖 How It Works</h3>
+                    <p>The agent follows a <strong>ReAct (Reason + Act)</strong> pattern:</p>
+                    <ul style="margin-top: 0.75rem;">
+                        <li><strong>Receives</strong> a user request</li>
+                        <li><strong>Thinks</strong> about what action to take</li>
+                        <li><strong>Selects</strong> an appropriate tool</li>
+                        <li><strong>Observes</strong> the result</li>
+                        <li><strong>Repeats</strong> until the task is complete</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-style: italic; color: var(--text-muted);">The agent can loop through these steps multiple times, autonomously deciding when to use each tool.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-dot agent"></div>
+                <span>Agent Core (GPT-5.1)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot prompt"></div>
+                <span>LangSmith Prompts</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot tool"></div>
+                <span>Available Tools</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot data"></div>
+                <span>Data Sources</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot output"></div>
+                <span>Output Files</span>
+            </div>
+        </div>
+
+        <!-- Agent Decision Flow -->
+        <div class="decision-flow">
+            <h3>Agent Decision Loop (ReAct Pattern)</h3>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="step-bubble input">💬</div>
+                    <h4>User Input</h4>
+                    <p>Receives request like "Generate statement of claim issues"</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-bubble think">🧠</div>
+                    <h4>Think</h4>
+                    <p>Agent reasons about what action to take next</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-bubble act">⚡</div>
+                    <h4>Act</h4>
+                    <p>Selects and executes a tool with parameters</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-bubble observe">👁️</div>
+                    <h4>Observe</h4>
+                    <p>Receives tool result and evaluates it</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-bubble output">✅</div>
+                    <h4>Complete</h4>
+                    <p>Returns final answer when task is done</p>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-style: italic;">
+                ↩️ The agent loops back from "Observe" to "Think" as many times as needed until the task is complete
+            </p>
+        </div>
+
+        <!-- Visual Agent Diagram -->
+        <div class="agent-flow">
+            <svg class="flow-svg" viewBox="0 0 1100 750" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background pattern -->
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.3"/>
+                    </pattern>
+                    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#d4a574;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#e8c49a;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#2dd4bf;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#c084fc;stop-opacity:1" />
+                    </linearGradient>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+                    </marker>
+                    <marker id="arrowhead-gold" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#d4a574"/>
+                    </marker>
+                    <marker id="arrowhead-teal" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#4ecdc4"/>
+                    </marker>
+                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)"/>
+
+                <!-- User Input -->
+                <rect x="30" y="300" width="140" height="80" rx="12" fill="#1a2332" stroke="#60a5fa" stroke-width="2"/>
+                <text x="100" y="330" fill="#60a5fa" font-family="Cormorant Garamond" font-size="14" font-weight="600" text-anchor="middle">💬 User Message</text>
+                <text x="100" y="355" fill="#94a3b8" font-family="Source Code Pro" font-size="10" text-anchor="middle">"Generate SOC</text>
+                <text x="100" y="370" fill="#94a3b8" font-family="Source Code Pro" font-size="10" text-anchor="middle">issues table"</text>
+
+                <!-- Arrow to Agent -->
+                <path d="M 170 340 L 240 340" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                <!-- Central Agent Box -->
+                <rect x="250" y="220" width="280" height="240" rx="20" fill="#1a2332" stroke="url(#goldGrad)" stroke-width="3"/>
+                <text x="390" y="255" fill="#d4a574" font-family="Cormorant Garamond" font-size="20" font-weight="700" text-anchor="middle">🤖 SOC Agent</text>
+                
+                <!-- Model Badge -->
+                <rect x="315" y="270" width="150" height="28" rx="6" fill="#243447" stroke="#d4a574" stroke-width="1"/>
+                <text x="390" y="290" fill="#d4a574" font-family="Source Code Pro" font-size="11" text-anchor="middle">ChatOpenAI (gpt-5.1)</text>
+                
+                <!-- System Prompt -->
+                <rect x="280" y="315" width="220" height="60" rx="10" fill="#2d1f47" stroke="#a78bfa" stroke-width="1.5"/>
+                <text x="390" y="338" fill="#a78bfa" font-family="Cormorant Garamond" font-size="12" font-weight="600" text-anchor="middle">⚡ LangSmith Prompt</text>
+                <text x="390" y="358" fill="#c084fc" font-family="Source Code Pro" font-size="11" text-anchor="middle">soc_system_prompt</text>
+                
+                <!-- Decision Text -->
+                <text x="390" y="400" fill="#94a3b8" font-family="Cormorant Garamond" font-size="12" text-anchor="middle">Decides which tool to use</text>
+                <text x="390" y="420" fill="#64748b" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">based on context & goal</text>
+
+                <!-- Reasoning Loop -->
+                <path d="M 280 435 C 280 480, 390 480, 500 435" stroke="#d4a574" stroke-width="2" stroke-dasharray="5,3" fill="none"/>
+                <text x="390" y="475" fill="#d4a574" font-family="Cormorant Garamond" font-size="10" text-anchor="middle">ReAct Loop</text>
+
+                <!-- Arrow to Tools -->
+                <path d="M 530 340 L 600 340" stroke="url(#goldGrad)" stroke-width="2" marker-end="url(#arrowhead-gold)"/>
+                <text x="565" y="330" fill="#d4a574" font-family="Source Code Pro" font-size="9" text-anchor="middle">calls</text>
+
+                <!-- Tools Container -->
+                <rect x="610" y="50" width="460" height="650" rx="16" fill="#1a2332" stroke="#4ecdc4" stroke-width="2" stroke-dasharray="4,2"/>
+                <text x="840" y="80" fill="#4ecdc4" font-family="Cormorant Garamond" font-size="16" font-weight="600" text-anchor="middle">🔧 Available Tools</text>
+
+                <!-- Tool 1: list_documents -->
+                <rect x="630" y="100" width="200" height="95" rx="10" fill="#0f1419" stroke="#4ecdc4" stroke-width="1.5"/>
+                <text x="730" y="125" fill="#4ecdc4" font-family="Source Code Pro" font-size="13" font-weight="600" text-anchor="middle">list_documents</text>
+                <text x="730" y="148" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">Lists all documents</text>
+                <text x="730" y="165" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">in the dataset folder</text>
+                <text x="730" y="185" fill="#60a5fa" font-family="Source Code Pro" font-size="9" text-anchor="middle">📁 dataset/documents/</text>
+
+                <!-- Tool 2: retrieve_document -->
+                <rect x="850" y="100" width="200" height="95" rx="10" fill="#0f1419" stroke="#4ecdc4" stroke-width="1.5"/>
+                <text x="950" y="125" fill="#4ecdc4" font-family="Source Code Pro" font-size="13" font-weight="600" text-anchor="middle">retrieve_document</text>
+                <text x="950" y="148" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">Fetches contents of</text>
+                <text x="950" y="165" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">a specific document</text>
+                <text x="950" y="185" fill="#60a5fa" font-family="Source Code Pro" font-size="9" text-anchor="middle">📄 filename → content</text>
+
+                <!-- Tool 3: get_all_document_details -->
+                <rect x="630" y="215" width="200" height="95" rx="10" fill="#0f1419" stroke="#4ecdc4" stroke-width="1.5"/>
+                <text x="730" y="240" fill="#4ecdc4" font-family="Source Code Pro" font-size="12" font-weight="600" text-anchor="middle">get_all_document</text>
+                <text x="730" y="255" fill="#4ecdc4" font-family="Source Code Pro" font-size="12" font-weight="600" text-anchor="middle">_details</text>
+                <text x="730" y="278" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">Gets metadata about</text>
+                <text x="730" y="295" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">all documents at once</text>
+
+                <!-- Tool 4: generate_soc_issue_table (highlighted as main) -->
+                <rect x="850" y="215" width="200" height="145" rx="10" fill="#1f1a2e" stroke="#a78bfa" stroke-width="2"/>
+                <text x="950" y="240" fill="#a78bfa" font-family="Source Code Pro" font-size="12" font-weight="600" text-anchor="middle">generate_soc</text>
+                <text x="950" y="255" fill="#a78bfa" font-family="Source Code Pro" font-size="12" font-weight="600" text-anchor="middle">_issue_table</text>
+                <text x="950" y="280" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">🌟 KEY TOOL 🌟</text>
+                <text x="950" y="300" fill="#94a3b8" font-family="Cormorant Garamond" font-size="10" text-anchor="middle">Uses LangSmith prompt</text>
+                <text x="950" y="315" fill="#c084fc" font-family="Source Code Pro" font-size="10" text-anchor="middle">soc_issue_table</text>
+                <text x="950" y="335" fill="#94a3b8" font-family="Cormorant Garamond" font-size="10" text-anchor="middle">to generate structured</text>
+                <text x="950" y="350" fill="#94a3b8" font-family="Cormorant Garamond" font-size="10" text-anchor="middle">court issues JSON</text>
+
+                <!-- Tool 5: write_court_issues_json -->
+                <rect x="740" y="380" width="200" height="95" rx="10" fill="#0f1419" stroke="#34d399" stroke-width="1.5"/>
+                <text x="840" y="405" fill="#34d399" font-family="Source Code Pro" font-size="12" font-weight="600" text-anchor="middle">write_court</text>
+                <text x="840" y="420" fill="#34d399" font-family="Source Code Pro" font-size="12" font-weight="600" text-anchor="middle">_issues_json</text>
+                <text x="840" y="443" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">Saves generated issues</text>
+                <text x="840" y="460" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">to court_issues.json</text>
+
+                <!-- Data Sources Box -->
+                <rect x="630" y="495" width="420" height="90" rx="10" fill="#0f1419" stroke="#60a5fa" stroke-width="1.5"/>
+                <text x="840" y="520" fill="#60a5fa" font-family="Cormorant Garamond" font-size="14" font-weight="600" text-anchor="middle">📂 Data Sources</text>
+                <text x="730" y="545" fill="#94a3b8" font-family="Source Code Pro" font-size="10" text-anchor="middle">dataset/documents/</text>
+                <text x="730" y="560" fill="#64748b" font-family="Source Code Pro" font-size="9" text-anchor="middle">Case files (A-U)</text>
+                <text x="950" y="545" fill="#94a3b8" font-family="Source Code Pro" font-size="10" text-anchor="middle">dataset/document_details/</text>
+                <text x="950" y="560" fill="#64748b" font-family="Source Code Pro" font-size="9" text-anchor="middle">document_details.md</text>
+
+                <!-- Output Box -->
+                <rect x="630" y="605" width="420" height="80" rx="10" fill="#0f1419" stroke="#34d399" stroke-width="1.5"/>
+                <text x="840" y="630" fill="#34d399" font-family="Cormorant Garamond" font-size="14" font-weight="600" text-anchor="middle">📤 Output</text>
+                <text x="840" y="655" fill="#94a3b8" font-family="Source Code Pro" font-size="11" text-anchor="middle">dataset/court_issues/court_issues.json</text>
+                <text x="840" y="675" fill="#64748b" font-family="Source Code Pro" font-size="10" text-anchor="middle">Structured legal issues ready for downstream workflows</text>
+
+                <!-- Connection from Tools back to Agent -->
+                <path d="M 610 400 C 560 400, 560 380, 530 380" stroke="#64748b" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowhead)"/>
+                <text x="555" y="410" fill="#64748b" font-family="Source Code Pro" font-size="9" text-anchor="middle">result</text>
+
+                <!-- Final Output Arrow -->
+                <path d="M 390 460 L 390 520 L 100 520 L 100 480" stroke="#34d399" stroke-width="2" marker-end="url(#arrowhead-teal)"/>
+                
+                <!-- Final Response -->
+                <rect x="30" y="400" width="140" height="80" rx="12" fill="#1a2332" stroke="#34d399" stroke-width="2"/>
+                <text x="100" y="430" fill="#34d399" font-family="Cormorant Garamond" font-size="14" font-weight="600" text-anchor="middle">✅ Response</text>
+                <text x="100" y="455" fill="#94a3b8" font-family="Source Code Pro" font-size="10" text-anchor="middle">"Issues saved to</text>
+                <text x="100" y="470" fill="#94a3b8" font-family="Source Code Pro" font-size="10" text-anchor="middle">court_issues.json"</text>
+            </svg>
+        </div>
+
+        <!-- Components Section -->
+        <section class="components-section">
+            <h2>Component Deep Dive</h2>
+
+            <!-- Agent Core -->
+            <div class="component-card agent-core">
+                <div class="component-header">
+                    <div class="component-icon">🤖</div>
+                    <div class="component-title-group">
+                        <h3>Agent Core</h3>
+                        <span class="file-name">src/soc_agent.py</span>
+                    </div>
+                </div>
+                <div class="component-body">
+                    <div>
+                        <div class="info-block">
+                            <h4 class="purpose">⚖️ Purpose</h4>
+                            <p>The central AI brain that orchestrates the entire document analysis process. It uses a large language model (GPT-5.1) to understand requests, make decisions, and coordinate tool usage.</p>
+                        </div>
+                        <div class="info-block" style="margin-top: 1rem;">
+                            <h4 style="color: var(--accent-teal);">🔧 Configuration</h4>
+                            <div style="margin-top: 0.75rem;">
+                                <p><strong>Model:</strong> <code>ChatOpenAI(model="gpt-5.1")</code></p>
+                                <p style="margin-top: 0.5rem;"><strong>Framework:</strong> LangChain Agent</p>
+                                <p style="margin-top: 0.5rem;"><strong>Pattern:</strong> ReAct (Reason + Act)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="prompt-section">
+                        <h4>LangSmith Prompt</h4>
+                        <div class="prompt-name">soc_system_prompt</div>
+                        <p style="color: var(--text-secondary);">This is the <strong>system prompt</strong> that guides the agent's behavior. It defines:</p>
+                        <ul style="margin-top: 0.75rem; list-style: none; padding: 0;">
+                            <li style="color: var(--text-secondary); margin-bottom: 0.5rem;">• The agent's role and capabilities</li>
+                            <li style="color: var(--text-secondary); margin-bottom: 0.5rem;">• How to analyze legal documents</li>
+                            <li style="color: var(--text-secondary); margin-bottom: 0.5rem;">• When to use each tool</li>
+                            <li style="color: var(--text-secondary); margin-bottom: 0.5rem;">• Output format expectations</li>
+                        </ul>
+                        <div class="prompt-description">
+                            <strong>Prompt Engineering Tip:</strong> Modify this prompt to change the agent's overall behavior, personality, and decision-making process.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools Section -->
+            <div class="component-card tool-card">
+                <div class="component-header">
+                    <div class="component-icon">🔧</div>
+                    <div class="component-title-group">
+                        <h3>Available Tools</h3>
+                        <span class="file-name">src/tools/document_store.py, src/tools/soc_issue_table.py</span>
+                    </div>
+                </div>
+                <div style="padding: 2rem;">
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 1.1rem;">
+                        The agent has access to 5 tools. It autonomously decides which tools to use and in what order based on the user's request and the current context.
+                    </p>
+                    <div class="tools-grid">
+                        <div class="tool-item">
+                            <h4>list_documents</h4>
+                            <p>Lists all documents available in the case dataset. The agent typically calls this first to understand what files are available for analysis.</p>
+                            <div class="tool-params">
+                                <h5>Parameters</h5>
+                                <p class="param"><span class="name">None</span></p>
+                                <h5 style="margin-top: 0.75rem;">Returns</h5>
+                                <p class="param">Newline-separated list of filenames</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <h4>retrieve_document</h4>
+                            <p>Fetches the full text content of a specific document by filename. Used to read claimant statement, defendant statement, or any other case file.</p>
+                            <div class="tool-params">
+                                <h5>Parameters</h5>
+                                <p class="param"><span class="name">filename</span> <span class="type">str</span></p>
+                                <h5 style="margin-top: 0.75rem;">Returns</h5>
+                                <p class="param">Full document text content</p>
+                            </div>
+                        </div>
+                        <div class="tool-item">
+                            <h4>get_all_document_details</h4>
+                            <p>Retrieves comprehensive metadata and descriptions for all documents at once. Helpful for understanding the case without reading every file.</p>
+                            <div class="tool-params">
+                                <h5>Parameters</h5>
+                                <p class="param"><span class="name">None</span></p>
+                                <h5 style="margin-top: 0.75rem;">Returns</h5>
+                                <p class="param">Markdown file with all document details</p>
+                            </div>
+                        </div>
+                        <div class="tool-item" style="border-color: var(--accent-purple);">
+                            <h4 style="color: var(--accent-purple);">generate_soc_issue_table ⭐</h4>
+                            <p><strong>KEY TOOL:</strong> Generates the structured Statement of Claim issues table using AI. This is the main analytical tool that produces the core output.</p>
+                            <div class="tool-params">
+                                <h5>Parameters</h5>
+                                <p class="param"><span class="name">claimant_statement</span> <span class="type">str</span></p>
+                                <p class="param"><span class="name">defendant_statement</span> <span class="type">str</span></p>
+                                <p class="param"><span class="name">table_of_documents</span> <span class="type">str</span></p>
+                                <h5 style="margin-top: 0.75rem;">Uses LangSmith Prompt</h5>
+                                <p class="param" style="color: var(--accent-purple);">soc_issue_table</p>
+                            </div>
+                        </div>
+                        <div class="tool-item" style="border-color: var(--accent-green);">
+                            <h4 style="color: var(--accent-green);">write_court_issues_json</h4>
+                            <p>Saves the generated court issues to a JSON file for use by downstream workflows (case law analysis, document analysis, etc.).</p>
+                            <div class="tool-params">
+                                <h5>Parameters</h5>
+                                <p class="param"><span class="name">content</span> <span class="type">str (JSON)</span></p>
+                                <h5 style="margin-top: 0.75rem;">Output Path</h5>
+                                <p class="param">dataset/court_issues/court_issues.json</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Flow Section -->
+        <div class="data-flow-section">
+            <h3>📊 Data Flow Through the Agent</h3>
+            <div class="data-categories">
+                <div class="data-category input">
+                    <h4>📥 Input Sources</h4>
+                    <div class="data-item">
+                        <span class="key">Statement of Claim</span>
+                        <div class="desc">O - Statement of Claim.md — The claimant's legal position and claims</div>
+                    </div>
+                    <div class="data-item">
+                        <span class="key">Statement of Defence</span>
+                        <div class="desc">P - Statement of Defence.md — The defendant's response and counter-arguments</div>
+                    </div>
+                    <div class="data-item">
+                        <span class="key">Document Details</span>
+                        <div class="desc">document_details.md — Metadata describing all available case documents</div>
+                    </div>
+                    <div class="data-item">
+                        <span class="key">Supporting Documents</span>
+                        <div class="desc">A-U files — Emails, invoices, agreements, witness statements, etc.</div>
+                    </div>
+                </div>
+                <div class="data-category process">
+                    <h4>⚙️ Processing</h4>
+                    <div class="data-item">
+                        <span class="key">Document Analysis</span>
+                        <div class="desc">Agent reads and understands case documents</div>
+                    </div>
+                    <div class="data-item">
+                        <span class="key">Issue Extraction</span>
+                        <div class="desc">Identifies disputed facts, legal questions, and relevant evidence</div>
+                    </div>
+                    <div class="data-item">
+                        <span class="key">Structure Generation</span>
+                        <div class="desc">Formats issues into structured JSON with all required fields</div>
+                    </div>
+                </div>
+                <div class="data-category output">
+                    <h4>📤 Output</h4>
+                    <div class="data-item">
+                        <span class="key">court_issues.json</span>
+                        <div class="desc">Structured array of legal issues, each containing:
+                            <br>• date_event
+                            <br>• undisputed_facts
+                            <br>• claimant_position
+                            <br>• defendant_position
+                            <br>• legal_issue
+                            <br>• relevant_documents
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prompt Engineering Guide -->
+        <div class="prompt-guide">
+            <h3>Prompt Engineering Guide</h3>
+            <p>Two prompts control this agent's behavior. Both are stored in <strong>LangSmith</strong> and can be edited there to fine-tune the analysis process.</p>
+            
+            <ul class="prompt-list">
+                <li>
+                    <span class="name">soc_system_prompt</span>
+                    <span class="purpose">
+                        <strong>Purpose:</strong> Defines the agent's identity, capabilities, and behavior. This is the "personality" of the agent.<br><br>
+                        <strong>What to Modify:</strong>
+                        <ul style="margin-top: 0.5rem; padding-left: 1rem;">
+                            <li>• Tone and communication style</li>
+                            <li>• Level of detail in responses</li>
+                            <li>• Decision-making priorities</li>
+                            <li>• Tool selection guidance</li>
+                            <li>• Legal analysis approach</li>
+                        </ul>
+                    </span>
+                </li>
+                <li>
+                    <span class="name">soc_issue_table</span>
+                    <span class="purpose">
+                        <strong>Purpose:</strong> Generates the structured court issues table from the claimant/defendant statements and document list.<br><br>
+                        <strong>Variables Available:</strong>
+                        <ul style="margin-top: 0.5rem; padding-left: 1rem;">
+                            <li>• <code>claimant_statement</code> — Full text of claimant's position</li>
+                            <li>• <code>defendant_statement</code> — Full text of defendant's response</li>
+                            <li>• <code>table_of_documents</code> — List of available evidence documents</li>
+                        </ul>
+                        <br>
+                        <strong>What to Modify:</strong>
+                        <ul style="margin-top: 0.5rem; padding-left: 1rem;">
+                            <li>• Issue identification criteria</li>
+                            <li>• Output JSON structure</li>
+                            <li>• Legal analysis depth</li>
+                            <li>• Document relevance assessment</li>
+                        </ul>
+                    </span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Use Cases -->
+        <div class="use-cases">
+            <h3>Typical Use Cases</h3>
+            <div class="use-case-grid">
+                <div class="use-case">
+                    <h4>📝 Generate Court Issues</h4>
+                    <p>The primary use case: analyze case documents and generate a structured list of legal issues for the court.</p>
+                    <div class="example">"From the given files, generate statement of claim issues JSON and give path to the file"</div>
+                </div>
+                <div class="use-case">
+                    <h4>🔍 Document Exploration</h4>
+                    <p>Ask the agent to summarize or explain specific documents in the case.</p>
+                    <div class="example">"What are the key points in the witness statement?"</div>
+                </div>
+                <div class="use-case">
+                    <h4>⚖️ Position Comparison</h4>
+                    <p>Have the agent compare and contrast the claimant and defendant positions.</p>
+                    <div class="example">"What are the main disagreements between the parties?"</div>
+                </div>
+                <div class="use-case">
+                    <h4>📋 Evidence Mapping</h4>
+                    <p>Ask which documents support or refute specific claims.</p>
+                    <div class="example">"Which documents relate to the payment disputes?"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typical Agent Flow -->
+        <div class="decision-flow">
+            <h3>Example: Typical Agent Execution Flow</h3>
+            <div style="background: var(--bg-primary); border-radius: 12px; padding: 2rem; margin-top: 1.5rem;">
+                <ol style="list-style: none; padding: 0; counter-reset: step;">
+                    <li style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--accent-blue);">
+                        <strong style="color: var(--accent-blue);">Step 1: Receive Request</strong>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">"Generate statement of claim issues from the case files"</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--accent-teal);">
+                        <strong style="color: var(--accent-teal);">Step 2: List Documents</strong>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Agent calls <code>list_documents()</code> to see available files</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--accent-teal);">
+                        <strong style="color: var(--accent-teal);">Step 3: Get Document Details</strong>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Agent calls <code>get_all_document_details()</code> to understand each file</p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--accent-teal);">
+                        <strong style="color: var(--accent-teal);">Step 4: Read Key Documents</strong>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Agent calls <code>retrieve_document("O - Statement of Claim.md")</code> and <code>retrieve_document("P - Statement of Defence.md")</code></p>
+                    </li>
+                    <li style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--accent-purple);">
+                        <strong style="color: var(--accent-purple);">Step 5: Generate Issues</strong>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Agent calls <code>generate_soc_issue_table()</code> with the statements and document details</p>
+                    </li>
+                    <li style="margin-bottom: 0; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid var(--accent-green);">
+                        <strong style="color: var(--accent-green);">Step 6: Save Output</strong>
+                        <p style="color: var(--text-secondary); margin-top: 0.5rem;">Agent calls <code>write_court_issues_json()</code> to save the structured issues</p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p><strong>Resolution AI</strong> — Statement of Claim Agent Documentation</p>
+        <p style="margin-top: 0.5rem;">Generated for prompt engineering and legal process understanding</p>
+    </footer>
+</body>
+</html>
+
+
