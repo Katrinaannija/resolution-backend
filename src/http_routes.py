@@ -37,6 +37,7 @@ app.add_middleware(
         "http://localhost:2024",
         "http://127.0.0.1:2024",
         "http://localhost:*",
+        "https://initial-fondle.lovable.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
