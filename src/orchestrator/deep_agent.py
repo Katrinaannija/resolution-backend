@@ -17,7 +17,7 @@ from src.documents.documents_state import DocumentsState
 from src.documents_workflow import graph as documents_graph
 from src.judgement.judgement_state import JudgementState
 from src.judgement_workflow import graph as judgement_graph
-from src.utils.pull_prompt import pull_prompt_async
+from src.utils.local_prompts import pull_prompt_async
 
 from src.orchestrator.orchestrator_state import IssueWorkState
 from src.orchestrator.storage import (

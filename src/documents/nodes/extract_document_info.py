@@ -8,7 +8,7 @@ from langchain_core.runnables import (
 
 from src.documents.documents_state import DocumentInfo, DocumentsState
 from src.tools.document_store import retrieve_document
-from src.utils.pull_prompt import pull_prompt_async
+from src.utils.local_prompts import pull_prompt_async
 
 
 async def extract_document_info(state: DocumentsState) -> DocumentsState:

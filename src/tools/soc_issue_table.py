@@ -1,7 +1,7 @@
 import json
 from langchain_core.tools import tool
 
-from src.utils.pull_prompt import pull_prompt
+from src.utils.local_prompts import pull_prompt
 
 
 def make_generate_soc_issue_table():

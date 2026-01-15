@@ -3,7 +3,7 @@ from typing import Dict, List
 from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnablePassthrough
 
 from src.case_law.case_law_state import CaseLawState
-from src.utils.pull_prompt import pull_prompt_async
+from src.utils.local_prompts import pull_prompt_async
 
 async def micro_verdicts(state: CaseLawState) -> CaseLawState:
     micro_verdict_prompt = await pull_prompt_async(

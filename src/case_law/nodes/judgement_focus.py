@@ -1,5 +1,5 @@
 from src.case_law.case_law_state import CaseLawState
-from src.utils.pull_prompt import pull_prompt_async
+from src.utils.local_prompts import pull_prompt_async
 
 
 async def judgement_focus(state: CaseLawState) -> CaseLawState:

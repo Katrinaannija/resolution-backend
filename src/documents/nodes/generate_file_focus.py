@@ -1,6 +1,6 @@
 from src.documents.documents_state import DocumentsState
 from src.tools.document_store import get_all_document_details
-from src.utils.pull_prompt import pull_prompt
+from src.utils.local_prompts import pull_prompt
 
 def generate_file_focus(state: DocumentsState) -> DocumentsState:
     """
@@ -10,7 +10,7 @@ def generate_file_focus(state: DocumentsState) -> DocumentsState:
     Generates a list of files that need to be inspected and what information 
     we're looking for in each file.
     """
-    # Pull the prompt from LangSmith
+    # Pull the prompt from local prompts
     file_instruction_prompt = pull_prompt(
         "documents_focus_area", include_model=True
     )

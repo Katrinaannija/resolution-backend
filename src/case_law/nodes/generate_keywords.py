@@ -1,7 +1,7 @@
 from typing import List
 
 from src.case_law.case_law_state import CaseLawState
-from src.utils.pull_prompt import pull_prompt_async
+from src.utils.local_prompts import pull_prompt_async
 
 
 async def generate_keywords(state: CaseLawState) -> CaseLawState:

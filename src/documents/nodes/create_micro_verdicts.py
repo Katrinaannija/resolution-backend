@@ -3,7 +3,7 @@ import json
 from typing import List
 
 from src.documents.documents_state import DocumentsState, MicroVerdict
-from src.utils.pull_prompt import pull_prompt_async
+from src.utils.local_prompts import pull_prompt_async
 
 
 async def create_micro_verdicts(state: DocumentsState) -> DocumentsState:
@@ -20,7 +20,7 @@ async def create_micro_verdicts(state: DocumentsState) -> DocumentsState:
     if not document_infos:
         return {"micro_verdicts": []}
     
-    # Pull the micro verdict prompt from LangSmith
+    # Pull the micro verdict prompt from local prompts
     micro_verdict_prompt = await pull_prompt_async(
         "documents_create_micro_verdict",
         include_model=True,

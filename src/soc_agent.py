@@ -16,14 +16,14 @@ from src.tools.document_store import (
     write_court_issues_json,
 )
 from src.tools.soc_issue_table import make_generate_soc_issue_table
-from src.utils.pull_prompt import pull_prompt_async
+from src.utils.local_prompts import pull_prompt_async
 
 generate_soc_issue_table = make_generate_soc_issue_table()
 
-# Prompt name in LangSmith hub
+# Prompt name for local prompts
 SOC_AGENT_USER_PROMPT_NAME = "soc_agent_user_prompt"
 
-# Fallback if the prompt is not yet in LangSmith
+# Fallback if the prompt cannot be loaded
 DEFAULT_SOC_AGENT_USER_MESSAGE = (
     "Generate the structured statement of claim issues JSON by analysing the "
     "statement of claim, statement of defence, and the document table. Use "
@@ -35,7 +35,7 @@ DEFAULT_SOC_AGENT_USER_MESSAGE = (
 
 async def _get_soc_user_prompt() -> str:
     """
-    Fetch the SOC agent user prompt from LangSmith.
+    Fetch the SOC agent user prompt from local prompts.
     Falls back to the hardcoded default if the prompt doesn't exist.
     """
     try:

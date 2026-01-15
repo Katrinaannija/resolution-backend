@@ -1,5 +1,5 @@
 from src.documents.documents_state import DocumentsState
-from src.utils.pull_prompt import pull_prompt
+from src.utils.local_prompts import pull_prompt
 
 def aggregate_documents_recommendations(state: DocumentsState) -> DocumentsState:
     """
