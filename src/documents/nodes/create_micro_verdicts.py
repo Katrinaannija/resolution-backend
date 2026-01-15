@@ -19,8 +19,8 @@ async def create_micro_verdicts(state: DocumentsState) -> DocumentsState:
     
     if not document_infos:
         return {"micro_verdicts": []}
-    
-    # Pull the micro verdict prompt from LangSmith
+
+    # Pull the micro verdict prompt from local registry
     micro_verdict_prompt = await pull_prompt_async(
         "documents_create_micro_verdict",
         include_model=True,

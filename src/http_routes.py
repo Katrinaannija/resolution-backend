@@ -32,10 +32,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://alien-lex-synth.lovable.app",
-        "https://eu.smith.langchain.com",
-        "https://smith.langchain.com",
         "http://localhost:2024",
         "http://127.0.0.1:2024",
+        "http://localhost:*",
     ],
     allow_credentials=True,
     allow_methods=["*"],

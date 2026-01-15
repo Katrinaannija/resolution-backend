@@ -1,6 +1,6 @@
 # Frontend Examples
 
-This folder contains standalone TypeScript examples that rely on LangSmith and LangChain. Each example is wired to run via `ts-node`.
+This folder contains standalone TypeScript examples that connect to the local LangGraph backend server using the LangGraph SDK. Each example is wired to run via `ts-node`.
 
 ## Setup
 
@@ -9,14 +9,16 @@ cd frontend-examples
 npm install
 ```
 
-Export your LangSmith credentials:
+Configure the LangGraph API connection:
 
 ```bash
-export LANGSMITH_API_KEY=sk-...
-export LANGSMITH_PROJECT=my-project # optional
+export LANGSMITH_DEPLOYMENT_URL=http://localhost:2024  # Local backend URL
+export LANGSMITH_API_KEY=dummy-key  # Not actually used for local dev, but SDK requires it
 ```
 
-Alternatively, place these values in `/Users/arturs/resolution-ai/.env` (one directory up from this folder). The scripts automatically call `dotenv` with that path, so the keys load without exporting them manually.
+Alternatively, place these values in the `.env` file in the project root. The scripts automatically call `dotenv` with that path, so the keys load without exporting them manually.
+
+**Note**: For local development, you don't need actual LangSmith credentials. The SDK client requires an API key parameter, but when connecting to your local `langgraph dev` server, it's not validated.
 
 ## Usage
 

@@ -1,7 +1,7 @@
 {
   "name": "frontend-examples",
   "version": "0.1.0",
-  "description": "LangSmith pipeline examples for the Resolution AI repo.",
+  "description": "LangGraph SDK examples for the Resolution AI backend.",
   "private": true,
   "type": "commonjs",
   "scripts": {

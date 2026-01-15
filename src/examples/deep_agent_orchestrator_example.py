@@ -9,7 +9,7 @@ def main() -> None:
     """
     Minimal smoke test for the orchestrator deep agent.
 
-    Runs the agent using prompts from LangSmith and prints a compact summary.
+    Runs the agent using local prompts and prints a compact summary.
     """
     agent = CourtIssueDeepAgent()
     result = agent.run()
