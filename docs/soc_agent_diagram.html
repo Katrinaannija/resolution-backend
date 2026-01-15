@@ -809,7 +809,7 @@
             </div>
             <div class="legend-item">
                 <div class="legend-dot prompt"></div>
-                <span>LangSmith Prompts</span>
+                <span>Local Prompts</span>
             </div>
             <div class="legend-item">
                 <div class="legend-dot tool"></div>
@@ -922,7 +922,7 @@
                 
                 <!-- System Prompt -->
                 <rect x="280" y="315" width="220" height="60" rx="10" fill="#2d1f47" stroke="#a78bfa" stroke-width="1.5"/>
-                <text x="390" y="338" fill="#a78bfa" font-family="Cormorant Garamond" font-size="12" font-weight="600" text-anchor="middle">⚡ LangSmith Prompt</text>
+                <text x="390" y="338" fill="#a78bfa" font-family="Cormorant Garamond" font-size="12" font-weight="600" text-anchor="middle">⚡ Local Prompt</text>
                 <text x="390" y="358" fill="#c084fc" font-family="Source Code Pro" font-size="11" text-anchor="middle">soc_system_prompt</text>
                 
                 <!-- Decision Text -->
@@ -967,7 +967,7 @@
                 <text x="950" y="240" fill="#a78bfa" font-family="Source Code Pro" font-size="12" font-weight="600" text-anchor="middle">generate_soc</text>
                 <text x="950" y="255" fill="#a78bfa" font-family="Source Code Pro" font-size="12" font-weight="600" text-anchor="middle">_issue_table</text>
                 <text x="950" y="280" fill="#94a3b8" font-family="Cormorant Garamond" font-size="11" text-anchor="middle">🌟 KEY TOOL 🌟</text>
-                <text x="950" y="300" fill="#94a3b8" font-family="Cormorant Garamond" font-size="10" text-anchor="middle">Uses LangSmith prompt</text>
+                <text x="950" y="300" fill="#94a3b8" font-family="Cormorant Garamond" font-size="10" text-anchor="middle">Uses local prompt</text>
                 <text x="950" y="315" fill="#c084fc" font-family="Source Code Pro" font-size="10" text-anchor="middle">soc_issue_table</text>
                 <text x="950" y="335" fill="#94a3b8" font-family="Cormorant Garamond" font-size="10" text-anchor="middle">to generate structured</text>
                 <text x="950" y="350" fill="#94a3b8" font-family="Cormorant Garamond" font-size="10" text-anchor="middle">court issues JSON</text>
@@ -1105,7 +1105,7 @@
                                 <p class="param"><span class="name">claimant_statement</span> <span class="type">str</span></p>
                                 <p class="param"><span class="name">defendant_statement</span> <span class="type">str</span></p>
                                 <p class="param"><span class="name">table_of_documents</span> <span class="type">str</span></p>
-                                <h5 style="margin-top: 0.75rem;">Uses LangSmith Prompt</h5>
+                                <h5 style="margin-top: 0.75rem;">Uses Local Prompt</h5>
                                 <p class="param" style="color: var(--accent-purple);">soc_issue_table</p>
                             </div>
                         </div>
@@ -1182,7 +1182,7 @@
         <!-- Prompt Engineering Guide -->
         <div class="prompt-guide">
             <h3>Prompt Engineering Guide</h3>
-            <p>Two prompts control this agent's behavior. Both are stored in <strong>LangSmith</strong> and can be edited there to fine-tune the analysis process.</p>
+            <p>Two prompts control this agent's behavior. Both are defined locally in <strong>src/utils/prompts.py</strong> and are version-controlled in the repository to fine-tune the analysis process.</p>
             
             <ul class="prompt-list">
                 <li>

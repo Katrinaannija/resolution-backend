@@ -7,10 +7,10 @@ def generate_file_focus(state: DocumentsState) -> DocumentsState:
     Step 1: Generate list of files to inspect and extraction goals for each file.
     
     Takes issue, recommendation, and suggestion as input.
-    Generates a list of files that need to be inspected and what information 
+    Generates a list of files that need to be inspected and what information
     we're looking for in each file.
     """
-    # Pull the prompt from LangSmith
+    # Pull the prompt from local registry
     file_instruction_prompt = pull_prompt(
         "documents_focus_area", include_model=True
     )

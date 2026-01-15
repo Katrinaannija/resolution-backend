@@ -193,9 +193,6 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 git clone https://github.com/Katrinaannija/resolution-backend.git
 cd resolution-backend
 
-# Checkout the branch with LangSmith removal
-git checkout claude/langsmith-prompt-dependency-i9yE1
-
 # Install dependencies
 uv sync
 ```

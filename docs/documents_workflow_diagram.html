@@ -968,7 +968,7 @@
                         </div>
                     </div>
                     <div class="prompt-section">
-                        <h4>LangSmith Prompt</h4>
+                        <h4>Local Prompt</h4>
                         <div class="prompt-name">documents_focus_area</div>
                         <p style="color: var(--text-secondary); margin-bottom: 1rem;">Determines which files to examine and what to look for in each</p>
                         <div class="prompt-vars">
@@ -1029,7 +1029,7 @@
                         </div>
                     </div>
                     <div class="prompt-section">
-                        <h4>LangSmith Prompt</h4>
+                        <h4>Local Prompt</h4>
                         <div class="prompt-name">documents_extract_content</div>
                         <p style="color: var(--text-secondary); margin-bottom: 1rem;">Extracts relevant information from each document based on the focus area</p>
                         <div class="prompt-vars">
@@ -1083,7 +1083,7 @@
                         </div>
                     </div>
                     <div class="prompt-section">
-                        <h4>LangSmith Prompt</h4>
+                        <h4>Local Prompt</h4>
                         <div class="prompt-name">documents_create_micro_verdict</div>
                         <p style="color: var(--text-secondary); margin-bottom: 1rem;">Generates a focused verdict based on each document's extracted information</p>
                         <div class="prompt-vars">
@@ -1140,7 +1140,7 @@
                         </div>
                     </div>
                     <div class="prompt-section">
-                        <h4>LangSmith Prompt</h4>
+                        <h4>Local Prompt</h4>
                         <div class="prompt-name">documents_aggregate_recommendations</div>
                         <p style="color: var(--text-secondary); margin-bottom: 1rem;">Combines all micro verdicts into a final document-enriched recommendation</p>
                         <div class="prompt-vars">
@@ -1294,7 +1294,7 @@
         <!-- Prompt Engineering Guide -->
         <div class="prompt-guide">
             <h3>Prompt Engineering Guide</h3>
-            <p>The following prompts are loaded from <strong>LangSmith</strong> and can be edited there. Each prompt directly influences how the AI analyzes documents and generates content at that stage. Modify these to fine-tune the analysis.</p>
+            <p>The following prompts are defined locally in <strong>src/utils/prompts.py</strong> and are version-controlled in the repository. Each prompt directly influences how the AI analyzes documents and generates content at that stage. Modify these to fine-tune the analysis.</p>
             
             <ul class="prompt-list">
                 <li>

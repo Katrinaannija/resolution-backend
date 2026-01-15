@@ -16,11 +16,10 @@
 ### Primary Technologies
 - **Python 3.11+** - Core runtime environment
 - **LangGraph 0.2.0+** - Multi-agent workflow orchestration framework
-- **LangChain 1.1.0+** - LLM integration and prompt management
-- **LangSmith 0.4.47+** - Observability, tracing, and prompt management
+- **LangChain 1.1.0+** - LLM integration and chains
 - **OpenAI GPT-5.1** - Primary language model (configurable)
 - **FastAPI 0.115.0+** - HTTP API server
-- **Langfuse 2.0.0+** - Additional observability and analytics
+- **Langfuse 2.0.0+** - Observability and analytics
 
 ### Development Tools
 - **uv** - Fast Python package installer and resolver
@@ -197,7 +196,7 @@ resolution-backend/
 **Key Configuration**:
 - `MAX_CASE_LAW_RUNS = 2`
 - `MAX_DOCUMENT_RUNS = 2`
-- Router prompt: `orchestrator_issue_router` (from LangSmith)
+- Router prompt: `orchestrator_issue_router` (local prompt in `src/utils/prompts.py`)
 
 ## State Management
 
@@ -325,8 +324,7 @@ uv sync
 cp .env.example .env  # Create if doesn't exist
 # Add required keys:
 # - OPENAI_API_KEY
-# - LANGSMITH_API_KEY
-# - LANGSMITH_PROJECT (optional)
+# - GLOBAL_MODEL (optional, defaults to gpt-4o-mini)
 ```
 
 ### Running the Development Server
@@ -357,9 +355,8 @@ uv run python -m src.soc_agent
 cd frontend-examples
 npm install
 
-# Set environment variables
-export LANGSMITH_API_KEY=sk-...
-export LANGSMITH_PROJECT=my-project
+# Frontend examples connect to the local backend HTTP API
+# Make sure the backend is running first (langgraph dev)
 
 # Run pipeline with custom question
 npm run run -- "How do we summarize the outstanding invoices?"
@@ -396,21 +393,26 @@ def update_state(state: MyState) -> MyState:
     return state
 ```
 
-### 3. LangSmith Prompt Management
+### 3. Local Prompt Management
 
-System prompts are stored in LangSmith Hub, not in code:
+System prompts are stored locally in `src/utils/prompts.py`, version-controlled in the repository:
 
 ```python
 from src.utils.pull_prompt import pull_prompt_async
 
-# Pull from LangSmith
-prompt = await pull_prompt_async("prompt_name")
+# Pull from local registry
+prompt = await pull_prompt_async("prompt_name", include_model=True)
 ```
 
-**Key Prompt Names**:
-- `soc_agent_user_prompt` - SOC agent instructions
-- `soc_system_prompt` - SOC agent system prompt
-- `orchestrator_issue_router` - Router decision logic
+**All 16 Prompts Defined in `src/utils/prompts.py`**:
+- **SOC Agent**: `soc_agent_user_prompt`, `soc_system_prompt`, `soc_issue_table`
+- **Orchestrator**: `orchestrator_issue_router`, `orchestrator_judgement_summary`
+- **Case Law**: `case_law_keywords`, `case_law_judgement_focus`, `case_law_issue_guidelines`, `case_law_micro_verdict`, `case_law_agg_recommendations`
+- **Documents**: `documents_focus_area`, `documents_extract_content`, `documents_create_micro_verdict`, `documents_agg_micro_verdicts`
+
+**Model Configuration**:
+- Default model: `gpt-4o-mini` (configurable via `GLOBAL_MODEL` environment variable)
+- Prompts can be bound to models using `include_model=True` parameter
 
 ### 4. Event Logging
 
@@ -585,21 +587,21 @@ curl http://localhost:2024/events
 
 ### Observability
 
-**LangSmith Integration**:
-- All LLM calls are traced
-- Prompts managed in LangSmith Hub
-- Runs viewable at smith.langchain.com
-
 **Langfuse Integration**:
-- Additional analytics and monitoring
-- Event tracking
+- LLM call tracing and analytics
+- Event tracking and monitoring
+- Performance metrics
+
+**Event Streaming**:
+- Real-time event logging to `dataset/agent/events/events.jsonl`
+- JSONL format for easy parsing and streaming
 
 ### Debugging Tips
 
 1. **Check event log**: `dataset/agent/events/events.jsonl`
 2. **Check issue state**: `dataset/orchestrator_state/issue_{index}.json`
 3. **Check agent state**: `dataset/agent/agent_state.json`
-4. **LangSmith traces**: View in LangSmith UI
+4. **Langfuse traces**: View in Langfuse dashboard
 5. **Server logs**: Console output from `langgraph dev`
 
 ## Common Pitfalls
@@ -626,13 +628,12 @@ await asyncio.to_thread(sync_function, args)
 
 ### 3. Missing Environment Variables
 
-**Problem**: OpenAI or LangSmith API keys not set.
+**Problem**: OpenAI API key not set.
 
 **Solution**: Ensure `.env` file exists with:
 ```bash
 OPENAI_API_KEY=sk-...
-LANGSMITH_API_KEY=ls__...
-LANGSMITH_PROJECT=resolution-ai
+GLOBAL_MODEL=gpt-4o-mini  # Optional, this is the default
 ```
 
 ### 4. Stale State
@@ -648,14 +649,14 @@ rm dataset/agent/events/events.jsonl
 
 ### 5. Prompt Not Found
 
-**Problem**: LangSmith prompt doesn't exist.
+**Problem**: Local prompt doesn't exist in registry.
 
-**Solution**: Ensure prompts are published in LangSmith Hub or use fallback:
+**Solution**: Ensure the prompt name exists in `src/utils/prompts.py` PROMPT_REGISTRY:
 ```python
-try:
-    prompt = await pull_prompt_async("prompt_name")
-except Exception:
-    prompt = DEFAULT_FALLBACK_PROMPT
+# All prompts are defined in src/utils/prompts.py
+# Check the PROMPT_REGISTRY dictionary for available prompt names
+from src.utils.prompts import PROMPT_REGISTRY
+print(PROMPT_REGISTRY.keys())  # View all available prompts
 ```
 
 ## AI Assistant Guidelines
@@ -667,7 +668,7 @@ When working with this codebase:
 3. **Use async/await consistently** for all I/O operations
 4. **Log events** for all significant operations
 5. **Test with the dev server** (`langgraph dev`) before proposing changes
-6. **Check LangSmith** for prompt versions before modifying prompts
+6. **Edit prompts in `src/utils/prompts.py`** - all prompts are version-controlled locally
 7. **Maintain backward compatibility** with existing state formats
 8. **Document new nodes** with clear docstrings
 9. **Follow the established patterns** for new workflows
@@ -676,9 +677,9 @@ When working with this codebase:
 ## Additional Resources
 
 - **LangGraph Documentation**: https://langchain-ai.github.io/langgraph/
-- **LangSmith**: https://smith.langchain.com/
 - **LangChain**: https://python.langchain.com/
 - **FastAPI**: https://fastapi.tiangolo.com/
+- **Langfuse**: https://langfuse.com/
 
 ## Version Information
 
