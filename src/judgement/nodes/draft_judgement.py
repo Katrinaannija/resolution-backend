@@ -11,12 +11,14 @@ def draft_judgement(state: JudgementState) -> JudgementState:
     """Call the local prompt to summarize resolved issues with proper case citations."""
     prompt = pull_prompt("orchestrator_judgement_summary", include_model=True)
 
-    # Format case citations for the prompt
+    # Format case citations for the prompt with precedent hierarchy
     case_citations = state.get("case_citations", [])
     if case_citations:
         formatted_citations = "\n\n".join([
             f"Issue {case.get('issue_index')}: {case.get('legal_issue', 'N/A')}\n"
             f"Case: {case.get('case_name', 'Unknown')} {case.get('citation', 'N/A')}\n"
+            f"Court: {case.get('court', 'N/A')}\n"
+            f"Controlling Precedent: {'YES - This is the highest authority case' if case.get('is_controlling_precedent', False) else 'No'}\n"
             f"Principle: {case.get('principle', 'N/A')}\n"
             f"Quote: \"{case.get('quote', 'N/A')}\"\n"
             f"Relevance: {case.get('relevance', 'N/A')}"

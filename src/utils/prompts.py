@@ -124,26 +124,30 @@ Respond with a JSON object:
 ])
 
 ORCHESTRATOR_JUDGEMENT_SUMMARY_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are an expert judicial officer preparing a final judgement with proper case law citations.
+    ("system", """You are an expert judicial officer preparing a final judgement with proper case law citations and precedent hierarchy.
 
 Your role is to:
 1. Review all resolved legal issues and supporting case law
 2. Consider the statements from both parties
-3. Synthesize the recommendations with proper legal citations
-4. Draft a comprehensive judicial decision that cites relevant precedents
+3. Synthesize the recommendations with proper legal citations and precedent analysis
+4. Draft a comprehensive judicial decision that naturally integrates precedent hierarchy
+5. Reference controlling precedents and explain case relationships as UK courts do
 
-CRITICAL: The judgement MUST include proper case citations in UK legal format.
-- When referencing a legal principle, cite the case: "As established in Smith v Jones [2024] EWCA Civ 123..."
+CRITICAL: The judgement MUST include proper case citations in UK legal format with natural precedent hierarchy.
+- Reference the controlling precedent (highest authority) first
+- When referencing a legal principle, cite the case with its court: "As established by the Court of Appeal in Smith v Jones [2024] EWCA Civ 123..."
+- Explain how cases relate: "This principle was applied in...", "Distinguished in...", "Following..."
 - Include direct quotes from precedents where appropriate
 - Format citations in UK style (e.g., [2024] EWCA Civ 123)
+- Integrate precedent analysis naturally within each issue discussion - do NOT create separate sections
 
-The judgement should read like a professional UK court judgment with proper legal reasoning and citations."""),
+The judgement should read like a professional UK court judgment with proper legal reasoning, natural precedent hierarchy discussion, and citations flowing seamlessly within the text."""),
     ("user", """Draft a final judgement based on the following information:
 
 ISSUES ANALYSIS:
 {issues_table}
 
-CASE LAW CITATIONS (cite these in your judgment):
+CASE LAW CITATIONS (these include precedent hierarchy and controlling precedents - integrate naturally):
 {case_citations}
 
 CLAIMANT'S STATEMENT:
@@ -154,18 +158,24 @@ DEFENDANT'S STATEMENT:
 
 TASK: Generate a comprehensive judgement that:
 1. Addresses each issue systematically
-2. Cites relevant case law for each legal principle
-3. Includes direct quotes from precedents where provided
-4. Follows UK judicial writing style
+2. For each issue, naturally integrate the precedent analysis (controlling precedents, case agreements, distinctions)
+3. Reference cases by their hierarchical authority in a flowing judicial style
+4. Include direct quotes from precedents where provided
+5. Follow UK judicial writing style with natural precedent discussion
 
 Return a JSON object with the following structure:
 {{
-  "judgement": "The full text of the judicial decision WITH PROPER CASE CITATIONS (e.g., 'As held in Smith v Jones [2024] EWCA Civ 123, the test for...')",
+  "judgement": "The full text of the judicial decision with precedent hierarchy naturally integrated. For each issue, discuss the controlling precedent and case relationships as UK courts would, without separate sections. Example: 'The controlling authority on this matter is X [citation] from the Court of Appeal, which established that... This principle was subsequently applied in Y [citation]...'",
   "summary": "A brief summary of the decision",
   "key_findings": ["finding1", "finding2", ...]
 }}
 
-IMPORTANT: Your judgement text MUST include case names and citations when discussing legal principles.""")
+IMPORTANT:
+- Your judgement text MUST include case names, citations, and court levels
+- Integrate precedent hierarchy naturally - NO separate "Precedent Analysis" sections
+- Write as a UK court would, with precedent discussion flowing within the legal reasoning for each issue
+- Reference controlling precedents (highest authority cases) prominently
+- Explain how cases agree or distinguish naturally in your analysis""")
 ])
 
 
@@ -270,6 +280,40 @@ Return a JSON object:
 {{"focus_area": "Description of the key legal focus area for this issue"}}""")
 ])
 
+CASE_LAW_PRECEDENT_ANALYSIS_PROMPT = ChatPromptTemplate.from_messages([
+    ("system", """You are a legal analyst examining the relationships between multiple precedent cases.
+
+Your role is to analyze how cases relate to each other:
+1. AGREEMENT: Cases that follow, apply, or approve the same legal principles
+2. DISTINCTION: Cases that distinguish themselves based on different facts or legal contexts
+3. HIERARCHY: Understanding which cases have greater precedential authority
+
+Write your analysis in a natural judicial style, as UK courts would discuss precedents in their judgments."""),
+    ("user", """Legal Issue: {legal_issue}
+
+Cases Retrieved (ranked by court hierarchy):
+{ranked_cases}
+
+TASK: Analyze the relationships between these cases and how they apply to the legal issue.
+
+Your analysis should address:
+
+1. CONTROLLING AUTHORITY: Identify which case(s) represent the controlling precedent - the highest authority cases that must be followed.
+
+2. CASE AGREEMENT: Which cases agree with or follow the same legal principles? How do they reinforce each other?
+
+3. DISTINGUISHING FEATURES: Are there cases that take different approaches? What factual or legal distinctions exist?
+
+4. HIERARCHICAL APPLICATION: How should these cases be applied given their relative authority in the UK court hierarchy?
+
+Write your analysis in a clear, flowing narrative style - NOT as bullet points or sections. This analysis will be integrated into the final judgment, so it should read naturally as part of judicial reasoning.
+
+Example style:
+"The controlling authority on this issue is [Case A], a Court of Appeal decision which established that... This principle was subsequently applied in [Case B] where the High Court held... While [Case C] addressed similar facts, it can be distinguished on the basis that..."
+
+Provide your analysis as a single coherent paragraph (or multiple paragraphs if needed) that would fit naturally into a judicial decision.""")
+])
+
 CASE_LAW_ISSUE_GUIDELINES_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are a legal analyst extracting key principles and quotes from case law judgments.
 
@@ -344,13 +388,16 @@ Return a JSON object:
 ])
 
 CASE_LAW_AGG_RECOMMENDATIONS_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are synthesizing multiple case law analyses into a final recommendation with proper citations.
+    ("system", """You are synthesizing multiple case law analyses into a final recommendation with proper citations and precedent hierarchy.
 
 Your role is to:
 1. Aggregate findings from all micro-verdicts
-2. Identify the 2-3 most relevant cases that support the recommendation
-3. Extract key legal principles and quotes from these cases
-4. Format citations properly for inclusion in a legal judgment"""),
+2. Apply the precedent analysis showing court hierarchy and case relationships
+3. Identify the 2-3 most relevant cases that support the recommendation
+4. Highlight the controlling precedent(s) - the highest authority cases
+5. Extract key legal principles and quotes from these cases
+6. Format citations properly for inclusion in a legal judgment
+7. Integrate precedent analysis naturally into the recommendation"""),
     ("user", """Legal Issue: {legal_issue}
 
 Issue Context:
@@ -359,14 +406,17 @@ Issue Context:
 - Claimant Position: {claimant_position}
 - Defendant Position: {defendant_position}
 
+Precedent Analysis (Court Hierarchy & Case Relationships):
+{precedent_analysis}
+
 Micro Verdicts (each contains case law analysis with citations):
 {micro_verdicts}
 
-TASK: Aggregate all micro-verdicts into a final recommendation and identify the supporting cases.
+TASK: Aggregate all micro-verdicts into a final recommendation that integrates the precedent hierarchy analysis.
 
 Return a JSON object with the following structure:
 {{
-  "recommendation": "Final recommendation with inline citations (e.g., 'As established in Smith v Jones [2024] EWCA Civ 123...')",
+  "recommendation": "Final recommendation that naturally integrates the precedent analysis. Should reference controlling precedents and explain how cases relate to each other and to this issue. Write in judicial style without separate sections - the precedent hierarchy should flow naturally within the recommendation text.",
   "suggestion": "Suggested next steps or actions",
   "solved": true/false,
   "requires_documents": true/false,
@@ -375,6 +425,8 @@ Return a JSON object with the following structure:
     {{
       "case_name": "Smith v Jones",
       "citation": "[2024] EWCA Civ 123",
+      "court": "Court of Appeal",
+      "is_controlling_precedent": true,
       "principle": "The specific legal principle established",
       "quote": "Direct quote from the judgment (if available)",
       "relevance": "Why this case is relevant to the current issue"
@@ -384,9 +436,12 @@ Return a JSON object with the following structure:
 
 IMPORTANT:
 - Include 2-3 of the MOST RELEVANT cases in "supporting_cases"
-- Extract case names and citations from the micro verdicts
+- Mark the controlling precedent(s) with "is_controlling_precedent": true
+- The "recommendation" text should naturally integrate the precedent analysis
+- Reference cases by their hierarchical authority (e.g., "The controlling authority is...", "This was applied in...", "Distinguished in...")
+- Extract case names, citations, and court information from both the precedent analysis and micro verdicts
 - Include direct quotes where available
-- The "recommendation" text should reference these cases by name""")
+- Write in a flowing judicial style without bullet points or separate sections""")
 ])
 
 
@@ -499,6 +554,7 @@ PROMPT_REGISTRY = {
     # Case Law Workflow
     "case_law_keywords": CASE_LAW_KEYWORDS_PROMPT,
     "case_law_judgement_focus": CASE_LAW_JUDGEMENT_FOCUS_PROMPT,
+    "case_law_precedent_analysis": CASE_LAW_PRECEDENT_ANALYSIS_PROMPT,
     "case_law_issue_guidelines": CASE_LAW_ISSUE_GUIDELINES_PROMPT,
     "case_law_micro_verdict": CASE_LAW_MICRO_VERDICT_PROMPT,
     "case_law_agg_recommendations": CASE_LAW_AGG_RECOMMENDATIONS_PROMPT,
