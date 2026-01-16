@@ -268,6 +268,10 @@ class CourtIssueDeepAgent:
             seen_keywords = sorted(seen_keywords)
         state["seen_keywords"] = seen_keywords
 
+        # Extract supporting cases for the final judgment
+        supporting_cases = result.get("supporting_cases", [])
+        state["supporting_cases"] = supporting_cases
+
         run_history = list(state["case_law_runs"]) if "case_law_runs" in state else []
         run_history.append(
             {

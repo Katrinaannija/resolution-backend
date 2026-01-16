@@ -124,19 +124,27 @@ Respond with a JSON object:
 ])
 
 ORCHESTRATOR_JUDGEMENT_SUMMARY_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are an expert judicial officer preparing a final judgement.
+    ("system", """You are an expert judicial officer preparing a final judgement with proper case law citations.
 
 Your role is to:
-1. Review all resolved legal issues
+1. Review all resolved legal issues and supporting case law
 2. Consider the statements from both parties
-3. Synthesize the recommendations from case law and document analysis
-4. Draft a comprehensive judicial decision
+3. Synthesize the recommendations with proper legal citations
+4. Draft a comprehensive judicial decision that cites relevant precedents
 
-The judgement should be clear, well-reasoned, and address each legal issue systematically."""),
+CRITICAL: The judgement MUST include proper case citations in UK legal format.
+- When referencing a legal principle, cite the case: "As established in Smith v Jones [2024] EWCA Civ 123..."
+- Include direct quotes from precedents where appropriate
+- Format citations in UK style (e.g., [2024] EWCA Civ 123)
+
+The judgement should read like a professional UK court judgment with proper legal reasoning and citations."""),
     ("user", """Draft a final judgement based on the following information:
 
 ISSUES ANALYSIS:
 {issues_table}
+
+CASE LAW CITATIONS (cite these in your judgment):
+{case_citations}
 
 CLAIMANT'S STATEMENT:
 {claimant_statement}
@@ -144,12 +152,20 @@ CLAIMANT'S STATEMENT:
 DEFENDANT'S STATEMENT:
 {defendant_statement}
 
-Generate a comprehensive judgement that addresses each issue. Return a JSON object with the following structure:
+TASK: Generate a comprehensive judgement that:
+1. Addresses each issue systematically
+2. Cites relevant case law for each legal principle
+3. Includes direct quotes from precedents where provided
+4. Follows UK judicial writing style
+
+Return a JSON object with the following structure:
 {{
-  "judgement": "The full text of the judicial decision",
+  "judgement": "The full text of the judicial decision WITH PROPER CASE CITATIONS (e.g., 'As held in Smith v Jones [2024] EWCA Civ 123, the test for...')",
   "summary": "A brief summary of the decision",
   "key_findings": ["finding1", "finding2", ...]
-}}""")
+}}
+
+IMPORTANT: Your judgement text MUST include case names and citations when discussing legal principles.""")
 ])
 
 
@@ -178,48 +194,60 @@ Issue Context:
 
 Previously Seen Keywords: {seen_keywords}
 
-TASK: Generate {num_keywords} NEW search keywords for UK National Archives case law database.
+TASK: Generate {num_keywords} NEW search keywords for UK National Archives case law database that target the CORE LEGAL PRINCIPLES at the heart of this issue.
 
-SEARCH STRATEGY GUIDANCE:
+CRITICAL: Your keywords must hit the "sweet spot" - not too generic (e.g., "contract law"), not too narrow (e.g., "breach of section 2.3.1 of agreement"), but targeting the fundamental legal principle that will appear in case law judgments.
 
-1. **Multi-Tier Approach** - Include keywords at different abstraction levels:
-   - Tier 1 (Broad): General legal principles (e.g., "breach of contract", "duty of care", "unjust enrichment")
-   - Tier 2 (Specific): UK legal doctrines and rules (e.g., "contra proferentem", "remoteness of damage", "Hadley v Baxendale")
-   - Tier 3 (Factual): Specific fact patterns (e.g., "late payment", "defective goods", "professional negligence")
+STEP-BY-STEP PROCESS:
 
-2. **UK-Specific Terminology**:
-   - Use UK legal terms (e.g., "claimant" not "plaintiff", "solicitor" not "attorney")
-   - Reference UK statutes where relevant (e.g., "Sale of Goods Act 1979", "Consumer Rights Act 2015")
-   - Consider UK common law concepts and equitable remedies
+Step 1: IDENTIFY THE CORE LEGAL PRINCIPLE
+Ask yourself:
+- What is the fundamental legal question this issue is asking? (e.g., "When does silence constitute acceptance in contract formation?")
+- What legal test, doctrine, or rule will determine the outcome? (e.g., "remoteness of damages test", "duty of care in negligent misstatement")
+- What would a judge cite to resolve this? (e.g., "principles of contractual interpretation", "implied terms for business efficacy")
 
-3. **Search Optimization**:
-   - Combine related terms with OR (e.g., "negligence OR duty of care")
-   - Use precise legal terminology that appears in judgments
-   - Avoid overly narrow searches (no case names unless directly relevant)
-   - Consider alternative legal frameworks and causes of action
+Step 2: GENERATE BALANCED KEYWORDS (Use this exact structure for {num_keywords} keywords):
+- 2 BROAD LEGAL PRINCIPLES: Core doctrines that judges would cite (e.g., "breach of implied term", "duty of care professional negligence", "remoteness of damage in contract")
+- 2 SPECIFIC LEGAL DOCTRINES: Precise UK legal tests or rules (e.g., "Hadley v Baxendale reasonable contemplation", "contra proferentem exclusion clause", "reasonable foreseeability negligence")
+- 1 FACTUAL PATTERN: The specific scenario in legal terms (e.g., "late payment commercial contract damages", "defective goods breach of warranty", "negligent advice reliance loss")
 
-4. **Iteration Strategy** (based on previously seen keywords):
-   - If previous keywords were too broad: Use more specific doctrines or fact patterns
-   - If previous keywords were too narrow: Broaden to general principles
-   - Try alternative legal theories or related areas of law
-   - Consider counterarguments and defenses
+EXAMPLES OF GOOD VS BAD KEYWORDS:
 
-5. **Core Legal Concepts to Extract**:
-   - What is the PRIMARY legal relationship? (contract, tort, property, equity, etc.)
-   - What is the SPECIFIC cause of action? (breach, negligence, misrepresentation, etc.)
-   - What REMEDY is sought? (damages, injunction, specific performance, etc.)
-   - What DEFENSES might apply? (limitation, exclusion clauses, contributory negligence, etc.)
+Issue: "Whether the defendant breached the contract by delivering goods late, causing the claimant to lose a lucrative resale opportunity"
+
+❌ TOO GENERIC: "contract law", "breach", "damages"
+❌ TOO NARROW: "late delivery", "resale contract", "2 week delay"
+✅ CORE PRINCIPLES:
+  - "breach of contract time of performance" (broad principle)
+  - "Hadley v Baxendale consequential loss" (specific doctrine)
+  - "late delivery loss of profit reasonable contemplation" (factual pattern with legal element)
+
+Issue: "Whether the solicitor owed a duty of care when advising on a property transaction"
+
+❌ TOO GENERIC: "negligence", "solicitor", "duty of care"
+❌ TOO NARROW: "property transaction advice", "solicitor negligence 2020"
+✅ CORE PRINCIPLES:
+  - "professional negligence solicitor duty of care" (broad principle)
+  - "negligent advice reliance reasonable foreseeability" (specific doctrine)
+  - "solicitor negligent property advice scope of duty" (factual pattern with legal element)
+
+QUALITY CHECKS:
+✓ Would a judge use these terms when citing precedents?
+✓ Do these terms appear in the ratio decidendi (legal reasoning) of judgments?
+✓ Do they capture the legal principle, not just the facts?
+✓ Are they specific enough to find relevant cases but broad enough to find multiple precedents?
 
 AVOID:
 - Repeating keywords from "Previously Seen Keywords"
-- Overly generic terms (e.g., just "law" or "case")
-- Non-legal factual details (e.g., specific dates, amounts, names)
-- Keywords that are too niche (unlikely to appear in multiple cases)
+- Generic terms without legal context (e.g., "payment", "delay", "advice")
+- Overly factual terms without legal principles (e.g., "3 month delay", "£50,000 loss")
+- Case names (unless the case name IS the doctrine, e.g., "Hadley v Baxendale")
+- Terms that wouldn't appear in a judgment's legal analysis
 
-Return a JSON object:
-{{"keywords": ["keyword1", "keyword2", "keyword3"]}}
+Return a JSON object with EXACTLY {num_keywords} keywords:
+{{"keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"]}}
 
-Each keyword should be optimized for UK National Archives search and provide a different angle on finding relevant precedents.""")
+Each keyword must target the core legal principle and be optimized for finding case law that addresses the fundamental legal question.""")
 ])
 
 CASE_LAW_JUDGEMENT_FOCUS_PROMPT = ChatPromptTemplate.from_messages([
@@ -243,15 +271,48 @@ Return a JSON object:
 ])
 
 CASE_LAW_ISSUE_GUIDELINES_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are synthesizing case law research and legal focus areas into actionable guidelines."""),
+    ("system", """You are a legal analyst extracting key principles and quotes from case law judgments.
+
+Your role is to:
+1. Identify the core legal principles established in the judgment
+2. Extract direct quotes that support these principles
+3. Preserve proper case citations for all extracted content
+4. Focus on the ratio decidendi (legal reasoning) not obiter dicta"""),
     ("user", """Focus Area: {focus_area}
 
-Retrieved Case Law Document:
+Case Citation: {case_citation}
+Case Name: {case_name}
+Citation: {citation}
+Court: {court}
+Date: {date}
+
+Retrieved Judgment Snippets:
 {court_judgment}
 
-Create comprehensive guidelines for resolving this issue based on the case law document and focus area.
+TASK: Extract legal principles and quotes from this case that are relevant to the focus area.
 
-Provide your guidelines as clear, structured text. This will be collected with other guidelines from different case law documents.""")
+Your output should include:
+1. CASE CITATION: Full citation of the case
+2. LEGAL PRINCIPLES: Key legal tests, doctrines, or rules established
+3. KEY QUOTES: 1-2 direct quotes that establish these principles (with quotation marks)
+4. APPLICATION: How these principles apply to similar fact patterns
+
+Format your response as structured text following this template:
+
+CASE: {case_name} {citation}
+
+LEGAL PRINCIPLES ESTABLISHED:
+- [Principle 1]
+- [Principle 2]
+
+KEY QUOTES:
+1. "[Direct quote from judgment]"
+2. "[Direct quote from judgment]"
+
+RELEVANCE TO ISSUE:
+[Brief explanation of how this case applies to the focus area]
+
+Be precise and cite the case name and citation in your guidelines so this information is preserved for the final judgment.""")
 ])
 
 CASE_LAW_MICRO_VERDICT_PROMPT = ChatPromptTemplate.from_messages([
@@ -283,7 +344,13 @@ Return a JSON object:
 ])
 
 CASE_LAW_AGG_RECOMMENDATIONS_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are synthesizing multiple case law analyses into a final recommendation."""),
+    ("system", """You are synthesizing multiple case law analyses into a final recommendation with proper citations.
+
+Your role is to:
+1. Aggregate findings from all micro-verdicts
+2. Identify the 2-3 most relevant cases that support the recommendation
+3. Extract key legal principles and quotes from these cases
+4. Format citations properly for inclusion in a legal judgment"""),
     ("user", """Legal Issue: {legal_issue}
 
 Issue Context:
@@ -292,19 +359,34 @@ Issue Context:
 - Claimant Position: {claimant_position}
 - Defendant Position: {defendant_position}
 
-Micro Verdicts:
+Micro Verdicts (each contains case law analysis with citations):
 {micro_verdicts}
 
-Aggregate all the micro-verdicts into a final recommendation and suggestion.
+TASK: Aggregate all micro-verdicts into a final recommendation and identify the supporting cases.
 
-Return a JSON object:
+Return a JSON object with the following structure:
 {{
-  "recommendation": "Final recommendation based on case law analysis",
+  "recommendation": "Final recommendation with inline citations (e.g., 'As established in Smith v Jones [2024] EWCA Civ 123...')",
   "suggestion": "Suggested next steps or actions",
   "solved": true/false,
   "requires_documents": true/false,
-  "requires_case_law": true/false
-}}""")
+  "requires_case_law": true/false,
+  "supporting_cases": [
+    {{
+      "case_name": "Smith v Jones",
+      "citation": "[2024] EWCA Civ 123",
+      "principle": "The specific legal principle established",
+      "quote": "Direct quote from the judgment (if available)",
+      "relevance": "Why this case is relevant to the current issue"
+    }}
+  ]
+}}
+
+IMPORTANT:
+- Include 2-3 of the MOST RELEVANT cases in "supporting_cases"
+- Extract case names and citations from the micro verdicts
+- Include direct quotes where available
+- The "recommendation" text should reference these cases by name""")
 ])
 
 

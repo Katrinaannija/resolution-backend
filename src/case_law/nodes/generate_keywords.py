@@ -19,7 +19,7 @@ async def generate_keywords(state: CaseLawState) -> CaseLawState:
         "defendant_position": issue.get("defendant_position", ""),
         "legal_issue": issue.get("legal_issue", ""),
         "relevant_documents": "\n".join(issue.get("relevant_documents", [])),
-        "num_keywords": 2,
+        "num_keywords": 5,
         "seen_keywords": list(state.get("seen_keywords", set())),
     }
 
