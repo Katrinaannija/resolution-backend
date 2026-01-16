@@ -29,6 +29,9 @@ class IssueWorkState(TypedDict, total=False):
     recommendation: str
     suggestion: str
 
+    # Supporting case law citations
+    supporting_cases: List[dict]  # Cases cited in the recommendation
+
     # Finalized signals
     solved: bool
     documents: bool

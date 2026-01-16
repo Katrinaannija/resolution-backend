@@ -5,12 +5,12 @@ from src.tools.case_law_search import search_case_law
 def search_caselaw(state: CaseLawState) -> CaseLawState:
   keywords = state["keywords"]
   all_cases = []
-  
+
   for keyword_set in keywords:
-    results = search_case_law.invoke({"query": keyword_set, "page": 1, "results_per_page": 2})
-    
+    results = search_case_law.invoke({"query": keyword_set, "page": 1, "results_per_page": 3})
+
     for idx, court_judgment in enumerate(results):
-      if idx >= 2:
+      if idx >= 3:
         break
 
       all_cases.append({
@@ -21,5 +21,5 @@ def search_caselaw(state: CaseLawState) -> CaseLawState:
         'date': court_judgment["date"],
         'url': court_judgment["url"]
       })
-      
+
   return {"cases": all_cases}
