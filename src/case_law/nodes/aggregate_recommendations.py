@@ -14,6 +14,7 @@ async def aggregate_recommendations(state: CaseLawState) -> CaseLawState:
     issue = state["issue"]
     micro_verdicts = state.get("micro_verdicts", [])
     issue_guidelines = state.get("issue_guidelines", [])
+    precedent_analysis = state.get("precedent_analysis", "No precedent analysis available.")
 
     # Include issue guidelines in the formatted output so the LLM can see case citations
     formatted_verdicts = "\n\n".join(
@@ -40,6 +41,7 @@ async def aggregate_recommendations(state: CaseLawState) -> CaseLawState:
             "claimant_position": issue.get("claimant_position", ""),
             "defendant_position": issue.get("defendant_position", ""),
             "legal_issue": issue.get("legal_issue", ""),
+            "precedent_analysis": precedent_analysis,
             "micro_verdicts": combined_input,
         }
     )

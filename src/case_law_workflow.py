@@ -8,6 +8,7 @@ from src.case_law.nodes.generate_keywords import generate_keywords
 from src.case_law.nodes.load_court_issue import load_court_issue
 from src.case_law.nodes.search_case_law import search_caselaw
 from src.case_law.nodes.fetch_case_document import fetch_case_document
+from src.case_law.nodes.analyze_precedents import analyze_precedents
 from src.case_law.nodes.judgement_focus import judgement_focus
 from src.case_law.nodes.create_issue_guidelines import create_issue_guidelines
 from src.case_law.nodes.micro_verdicts import micro_verdicts
@@ -24,6 +25,7 @@ workflow.add_node("load_court_issue", load_court_issue)
 workflow.add_node("generate_keywords", generate_keywords)
 workflow.add_node("search_caselaw", search_caselaw)
 workflow.add_node("fetch_case_document", fetch_case_document)
+workflow.add_node("analyze_precedents", analyze_precedents)
 
 # Pipeline B: Judgement focus analysis (runs in parallel)
 workflow.add_node("judgement_focus", judgement_focus)
@@ -48,12 +50,13 @@ workflow.add_edge("initialize_state", "load_court_issue")
 workflow.add_edge("load_court_issue", "generate_keywords")
 workflow.add_edge("generate_keywords", "search_caselaw")
 workflow.add_edge("search_caselaw", "fetch_case_document")
+workflow.add_edge("fetch_case_document", "analyze_precedents")
 
 # Pipeline B edges (judgement focus path - runs in parallel)
 workflow.add_edge("load_court_issue", "judgement_focus")
 
 # Join both pipelines at create_issue_guidelines
-workflow.add_edge("fetch_case_document", "create_issue_guidelines")
+workflow.add_edge("analyze_precedents", "create_issue_guidelines")
 workflow.add_edge("judgement_focus", "create_issue_guidelines")
 
 # Sequential processing after join

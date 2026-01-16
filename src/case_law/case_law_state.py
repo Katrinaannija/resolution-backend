@@ -15,6 +15,10 @@ class CaseMetadata(TypedDict, total=False):
     date: str
     url: str
     keyword_set: str
+    court_level: int  # Precedential authority level
+    court_level_value: int  # Numeric value for sorting
+    court_level_name: str  # Human-readable court level
+    precedent_rank: int  # Ranking by authority (1 = highest)
 
 class CaseLawState(TypedDict, total=False):
     # index from court issues json, work on a specific issue
@@ -46,6 +50,11 @@ class CaseLawState(TypedDict, total=False):
     # Supporting cases for the final recommendation
     supporting_cases: List[dict]  # Cases cited in the recommendation with principles
 
+    # Precedent analysis
+    controlling_precedents: List[dict]  # The highest authority case(s)
+    precedent_analysis: str  # LLM analysis of case relationships (agreement/distinction)
+    ranked_cases: List[dict]  # All cases ranked by authority
+
     solved: bool
     documents: bool
     case_law: bool
@@ -75,6 +84,9 @@ def create_initial_state(issue_index: int = 0) -> CaseLawState:
         issue_guidelines=[],
         micro_verdicts=[],
         supporting_cases=[],
+        controlling_precedents=[],
+        precedent_analysis="",
+        ranked_cases=[],
         output_text=""
     )
  
